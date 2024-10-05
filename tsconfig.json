@@ -2,12 +2,17 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "moduleResolution": "node",
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "types/**/*"],
+  "exclude": ["node_modules"]
 }
