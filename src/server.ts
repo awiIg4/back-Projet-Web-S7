@@ -6,7 +6,7 @@ import { connectDB } from './models';
 config();
 
 const app = express();
-app.use(express.json());
+app.use(express.json());  // Middleware pour parser les requêtes au format JSON
 
 // Importer les routes
 import utilisateurRoutes from './routes/utilisateur';
@@ -20,8 +20,8 @@ import sessionRoutes from './routes/session';
 import depotRoutes from './routes/depot';
 
 // Associer les routes à des chemins spécifiques
-app.use('/api/utilisateur', utilisateurRoutes);
-app.use('/api/administrateur', administrateurRoutes);
+app.use('/api/utilisateurs', utilisateurRoutes);
+app.use('/api/administrateurs', administrateurRoutes);
 app.use('/api/vendeurs', vendeurRoutes);
 app.use('/api/acheteurs', acheteurRoutes);
 app.use('/api/jeux', jeuRoutes);
