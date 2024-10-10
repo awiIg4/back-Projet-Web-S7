@@ -1,52 +1,52 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database';
-import Jeu from './jeu';
-import Acheteur from './acheteur';
+import Utilisateur from './utilisateur';
+import Session from './session';
 
-class Achat extends Model {
+class Somme extends Model {
   public id!: number;
-  public jeu_id!: number;
-  public acheteur_id!: number;
-  public date_transaction!: Date;
-  public commission!: number;
+  public utilisateurId!: number;
+  public sessionId!: number;
+  public sommedue!: number;
+  public sommegenerée!: number;
 }
 
-Achat.init({
+Somme.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
   },
-  jeu_id: {
+  utilisateurId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Jeu,
+      model: Utilisateur,
       key: 'id',
     },
   },
-  acheteur_id: {
+  sessionId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Acheteur,
+      model: Session,
       key: 'id',
     },
   },
-  date_transaction: {
-    type: DataTypes.DATE,
+  sommedue: {
+    type: DataTypes.DECIMAL,
     allowNull: false,
   },
-  commission: {
+  sommegenerée: {
     type: DataTypes.DECIMAL,
     allowNull: false,
   },
 }, {
   sequelize,
-  modelName: 'Achat',
-  tableName: 'achats',
+  modelName: 'Somme',
+  tableName: 'sommes',
   timestamps: false,
 });
 
-export default Achat;
+export default Somme;

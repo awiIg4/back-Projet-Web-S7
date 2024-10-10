@@ -1,22 +1,26 @@
-import { Model, Table, Column, DataType, ForeignKey, HasMany } from 'sequelize-typescript';
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../config/database';
 import Utilisateur from './utilisateur';
-import Depot from './depot';
-import Achat from './achat';
 
-@Table
 class Vendeur extends Model {
-  @ForeignKey(() => Utilisateur)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  id!: number;
-
-  @HasMany(() => Depot)
-  depots!: Depot[];
-
-  @HasMany(() => Achat)
-  achats!: Achat[];
+  public id!: number;
 }
+
+Vendeur.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+    references: {
+      model: Utilisateur,
+      key: 'id',
+    },
+  },
+}, {
+  sequelize,
+  modelName: 'Vendeur',
+  tableName: 'vendeurs',
+  timestamps: false,
+});
 
 export default Vendeur;

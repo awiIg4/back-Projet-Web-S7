@@ -1,12 +1,14 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database';
+import Editeur from './editeur';
 
-class Editeur extends Model {
+class Licence extends Model {
   public id!: number;
   public nom!: string;
+  public editeur_id!: number;
 }
 
-Editeur.init({
+Licence.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -17,11 +19,19 @@ Editeur.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
+  editeur_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Editeur,
+      key: 'id',
+    },
+  },
 }, {
   sequelize,
-  modelName: 'Editeur',
-  tableName: 'editeurs',
+  modelName: 'Licence',
+  tableName: 'licences',
   timestamps: false,
 });
 
-export default Editeur;
+export default Licence;

@@ -1,79 +1,48 @@
-import { Model, Table, Column, DataType, HasOne, BeforeCreate, BeforeUpdate } from 'sequelize-typescript';
-import bcrypt from 'bcrypt';
-import Administrateur from './administrateur';
-import Vendeur from './vendeur';
-import Acheteur from './acheteur';
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../config/database';
 
-const saltRounds = 10; // Nombre de tours pour le hashage de bcrypt
-
-@Table
 class Utilisateur extends Model {
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  nom!: string;
+  public id!: number;
+  public nom!: string;
+  public email!: string;
+  public telephone!: string;
+  public adresse?: string;
+  public type_utilisateur!: string;
+}
 
-  @Column({
-    type: DataType.STRING,
+Utilisateur.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  nom: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-  })
-  email!: string;
-
-  @Column({
-    type: DataType.STRING,
+  },
+  telephone: {
+    type: DataTypes.STRING,
     allowNull: false,
-  })
-  telephone!: string;
-
-  @Column({
-    type: DataType.STRING,
-  })
-  adresse!: string;
-
-  @Column({
-    type: DataType.ENUM('administrateur', 'vendeur', 'acheteur'),
+  },
+  adresse: {
+    type: DataTypes.STRING,
+  },
+  type_utilisateur: {
+    type: DataTypes.STRING,
     allowNull: false,
-  })
-  typeUtilisateur!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  motdepasse!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  refreshToken?: string | null;
-
-  @HasOne(() => Administrateur)
-  administrateur!: Administrateur;
-
-  @HasOne(() => Vendeur)
-  vendeur!: Vendeur;
-
-  @HasOne(() => Acheteur)
-  acheteur!: Acheteur;
-
-  // Hash du mot de passe avant la création
-  @BeforeCreate
-  static async hashPasswordBeforeCreate(utilisateur: Utilisateur) {
-    if (utilisateur.motdepasse) {
-      utilisateur.motdepasse = await bcrypt.hash(utilisateur.motdepasse, saltRounds);
-    }
-  }
-
-  // Hash du mot de passe avant la mise à jour
-  @BeforeUpdate
-  static async hashPasswordBeforeUpdate(utilisateur: Utilisateur) {
-    if (utilisateur.changed('motdepasse')) {
-      utilisateur.motdepasse = await bcrypt.hash(utilisateur.motdepasse, saltRounds);
-    }
-  }
-}
+    comment: "administrateur, gestionnaire, vendeur, acheteur",
+  },
+}, {
+  sequelize,
+  modelName: 'Utilisateur',
+  tableName: 'utilisateurs',
+  timestamps: false,
+});
 
 export default Utilisateur;

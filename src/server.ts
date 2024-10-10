@@ -3,37 +3,36 @@ import { config } from 'dotenv';
 import { connectDB } from './models';
 import cookieParser from 'cookie-parser';
 
-// Charger les variables d'environnement
-config();
+config(); // Charger les variables d'environnement
 
 const app = express();
-app.use(express.json());  // Middleware pour parser les requêtes au format JSON
+app.use(express.json());
+app.use(cookieParser());
 
 // Importer les routes
-//import administrateurRoutes from './routes/administrateur';
-import vendeurRoutes from './routes/vendeur';
+import administrateurRoutes from './routes/administrateur';
+import gestionnaireRoutes from './routes/gestionnaire';
 import acheteurRoutes from './routes/acheteur';
-//import jeuRoutes from './routes/jeu';
-//import editeurRoutes from './routes/editeur';
-//import achatRoutes from './routes/achat';
-//import sessionRoutes from './routes/session';
-//import depotRoutes from './routes/depot';
+import vendeurRoutes from './routes/vendeur';
+import licenceRoutes from './routes/licence';
+import editeurRoutes from './routes/editeur';
+import sessionRoutes from './routes/session';
+import codePromotionRoutes from './routes/codePromotion';
+
 
 // Associer les routes à des chemins spécifiques
-//app.use('/api/administrateurs', administrateurRoutes);
-app.use('/api/vendeurs', vendeurRoutes);
+app.use('/api/administrateurs', administrateurRoutes);
+app.use('/api/gestionnaires', gestionnaireRoutes);
 app.use('/api/acheteurs', acheteurRoutes);
-//app.use('/api/jeux', jeuRoutes);
-//app.use('/api/editeurs', editeurRoutes);
-//app.use('/api/achats', achatRoutes);
-//app.use('/api/sessions', sessionRoutes);
-//app.use('/api/depots', depotRoutes);
+app.use('/api/vendeurs', vendeurRoutes);
+app.use('/api/licences', licenceRoutes); 
+app.use('/api/editeurs', editeurRoutes); 
+app.use('/api/session', sessionRoutes); 
+app.use('/api/codePromotion', codePromotionRoutes); 
+
 
 // Connexion à la base de données
 connectDB();
-
-// Middleware pour lire les cookies
-app.use(cookieParser());
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;

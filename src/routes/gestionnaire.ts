@@ -18,16 +18,16 @@ interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
-// Middleware pour vérifier si l'utilisateur est administrateur
-export function isAdministrateur(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  if (req.user?.typeUtilisateur !== 'administrateur') {
-    res.status(403).send('Accès refusé. Vous n\'êtes pas un administrateur.');
+// Middleware pour vérifier si l'utilisateur est gestionnaire
+export function isGestionnaire(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
+  if (req.user?.typeUtilisateur !== 'gestionnaire') {
+    res.status(403).send('Accès refusé. Vous n\'êtes pas un gestionnaire.');
     return;
   }
   next();
 }
 
-// Route d'inscription pour les administrateurs
+// Route d'inscription pour les gestionnaires
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
     const { nom, email, telephone, adresse, motdepasse } = req.body;
   
@@ -38,33 +38,33 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
         return;
       }
   
-      // Créer le nouvel utilisateur sans mot de passe (mot de passe sera stocké dans la table Administrateur)
+      // Créer le nouvel utilisateur sans mot de passe (mot de passe sera stocké dans la table Gestionnaire)
       const nouvelUtilisateur = await Utilisateur.create({
         nom,
         email,
         telephone,
         adresse,
-        type_utilisateur: 'administrateur',
+        type_utilisateur: 'gestionnaire',
       });
   
       // Hacher le mot de passe
       const hashedPassword = await bcrypt.hash(motdepasse, 10);
   
-      // Créer l'entrée associée dans la table Administrateur avec le mot de passe haché
+      // Créer l'entrée associée dans la table Gestionnaire avec le mot de passe haché
       await Administrateur.create({
         id: nouvelUtilisateur.id, // Référence l'ID de l'utilisateur
         mot_de_passe: hashedPassword,
       });
   
-      res.status(201).send('Compte administrateur créé avec succès.');
+      res.status(201).send('Compte gestionnaire créé avec succès.');
     } catch (error) {
       console.error(error);
-      res.status(500).send('Erreur lors de la création du compte administrateur.');
+      res.status(500).send('Erreur lors de la création du compte gestionnaire.');
     }
   });
   
 
-// Route de connexion pour les administrateurs
+// Route de connexion pour les gestionnaires
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
     const { email, motdepasse } = req.body;
   
@@ -72,20 +72,21 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       // Rechercher l'utilisateur par email
       const utilisateur = await Utilisateur.findOne({ where: { email } });
   
-      // Vérifier si l'utilisateur existe et si c'est bien un administrateur
-      if (!utilisateur || utilisateur.type_utilisateur !== 'administrateur') {
+      // Vérifier si l'utilisateur existe et si c'est bien un gestionnaire
+      if (!utilisateur || utilisateur.type_utilisateur !== 'gestionnaire') {
         res.status(400).send('Email ou mot de passe incorrect.');
         return;
       }
   
       // Récupérer le mot de passe depuis la table Administrateur
-      const administrateur = await Administrateur.findOne({ where: { utilisateurId: utilisateur.id } });
-      if (!administrateur) {
+      const gestionnaire = await Administrateur.findOne({ where: { utilisateurId: utilisateur.id } });
+      if (!gestionnaire) {
         res.status(400).send('Email ou mot de passe incorrect.');
         return;
       }
   
-      const validPassword = await bcrypt.compare(motdepasse, administrateur.mot_de_passe);
+      // Comparer le mot de passe fourni avec le mot de passe haché
+      const validPassword = await bcrypt.compare(motdepasse, gestionnaire.mot_de_passe);
       if (!validPassword) {
         res.status(400).send('Email ou mot de passe incorrect.');
         return;
@@ -115,7 +116,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        path: '/api/administrateurs/refresh-token',
+        path: '/api/gestionnaires/refresh-token',
       });
   
       res.status(200).send('Connexion réussie.');
@@ -143,7 +144,7 @@ router.post('/refresh-token', (req: Request, res: Response): void => {
       const userId = decoded.userId;
   
       const newAccessToken = jwt.sign(
-        { userId, typeUtilisateur: 'administrateur' },
+        { userId, typeUtilisateur: 'gestionnaire' },
         accessTokenSecret,
         { expiresIn: '15m' }
       );
@@ -156,14 +157,14 @@ router.post('/refresh-token', (req: Request, res: Response): void => {
   
       res.status(200).send('Token d\'accès rafraîchi avec succès.');
     });
-  });  
-
-// Route de déconnexion pour les administrateurs
-router.post('/logout', (req: Request, res: Response): void => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
-
-  res.status(200).send('Déconnexion réussie.');
-});
-
-export default router;
+  });
+  
+  // Route de déconnexion pour les gestionnaires
+  router.post('/logout', (req: Request, res: Response): void => {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+  
+    res.status(200).send('Déconnexion réussie.');
+  });
+  
+  export default router;
