@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import Utilisateur from '../models/utilisateur';
-import { isAdministrateur } from './administrateur';
+import { isAdministrateur } from './middleware';
 
 config(); // Charger les variables d'environnement
 
@@ -21,7 +21,7 @@ router.get('/', isAdministrateur, async (req: Request, res: Response): Promise<v
 // Route pour mettre à jour un utilisateur (administrateur uniquement)
 router.put('/:id', isAdministrateur, async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { nom, telephone, adresse, type_utilisateur } = req.body;
+  const { nom, telephone, adresse } = req.body;
 
   try {
     const utilisateur = await Utilisateur.findByPk(id);
@@ -34,7 +34,6 @@ router.put('/:id', isAdministrateur, async (req: Request, res: Response): Promis
     utilisateur.nom = nom || utilisateur.nom;
     utilisateur.telephone = telephone || utilisateur.telephone;
     utilisateur.adresse = adresse || utilisateur.adresse;
-    utilisateur.type_utilisateur = type_utilisateur || utilisateur.type_utilisateur;
 
     await utilisateur.save();
 

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import { Op } from 'sequelize';
 import Session from '../models/session';
-import { isAdministrateur } from './administrateur';
+import { isAdministrateur } from './middleware';
 
 config(); // Charger les variables d'environnement
 

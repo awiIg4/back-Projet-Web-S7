@@ -1,6 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database';
 import Utilisateur from './utilisateur';
+import Depot from './depot'
 
 class Vendeur extends Model {
   public id!: number;
@@ -22,5 +23,8 @@ Vendeur.init({
   tableName: 'vendeurs',
   timestamps: false,
 });
+
+// Associations
+Vendeur.hasMany(Depot, { as: 'depots', foreignKey: 'vendeur_id' });
 
 export default Vendeur;

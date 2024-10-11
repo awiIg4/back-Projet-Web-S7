@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import { Op } from 'sequelize';
 import Licence from '../models/licence';
 import Editeur from '../models/editeur';
-import { isAdministrateur } from './administrateur';
+import { isAdministrateur } from './middleware';
 
 config(); // Charger les variables d'environnement
 

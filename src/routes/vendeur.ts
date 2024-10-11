@@ -5,12 +5,11 @@ import sequelize from '../config/database';
 import Utilisateur from '../models/utilisateur';
 import Vendeur from '../models/vendeur';
 import Jeu from '../models/jeu';
+import Depot from '../models/depot'
 import Somme from '../models/somme';
 import Licence from '../models/licence'
 import Session from '../models/session';
-import { isAdministrateur } from './administrateur';
-import { isGestionnaire } from './gestionnaire';
-
+import { isAdminOrManager} from './middleware';
 
 config(); // Charger les variables d'environnement
 
@@ -22,14 +21,6 @@ interface AuthenticatedRequest extends Request {
     userId: number;
     typeUtilisateur: string;
   };
-}
-
-// Middleware pour vérifier si l'utilisateur est administrateur ou gestionnaire
-export function isAdminOrManager(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  if (req.user && (req.user.typeUtilisateur === 'administrateur' || req.user.typeUtilisateur === 'gestionnaire')) {
-    return next();
-  }
-  res.status(403).send('Accès refusé. Vous n\'êtes pas autorisé.');
 }
 
 // Route pour créer un vendeur avec un email unique
@@ -110,28 +101,48 @@ router.get('/informations/:id', isAdminOrManager, async (req: AuthenticatedReque
 });
 
 // Route pour récupérer les jeux vendus et en vente pour une session
-router.get('/stock/:idsession', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  const { idsession } = req.params;
-  const { numpage = 1 } = req.query;
+router.get(
+  '/stock/:idsession',
+  isAdminOrManager,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { idsession } = req.params;
+    const { numpage = 1 } = req.query;
 
-  try {
-    const jeux = await Jeu.findAll({
-      where: {
-        sessionId: idsession,
-        statut: {
-          [Op.in]: ['en vente', 'vendu'],
+    try {
+      const jeux = await Jeu.findAll({
+        where: {
+          statut: {
+            [Op.in]: ['en vente', 'vendu'],
+          },
         },
-      },
-      limit: 10,
-      offset: (Number(numpage) - 1) * 10,
-    });
+        include: [
+          {
+            model: Depot,
+            as: 'depot',
+            required: true,
+            include: [
+              {
+                model: Session,
+                as: 'session',
+                required: true,
+                where: {
+                  id: idsession,
+                },
+              },
+            ],
+          },
+        ],
+        limit: 10,
+        offset: (Number(numpage) - 1) * 10,
+      });
 
-    res.status(200).json(jeux);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Erreur lors de la récupération des jeux pour la session.');
+      res.status(200).json(jeux);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erreur lors de la récupération des jeux pour la session.');
+    }
   }
-});
+);
 
 // Route pour récupérer la somme due au vendeur pour une session
 router.get('/sommedue/:idsession', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {

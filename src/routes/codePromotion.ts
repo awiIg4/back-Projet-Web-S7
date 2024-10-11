@@ -1,8 +1,7 @@
 import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import CodePromo from '../models/codePromotion';
-import { isAdministrateur } from './administrateur';
-import { isAdminOrManager } from './vendeur';
+import { isAdministrateur, isAdminOrManager } from './middleware';
 
 config(); // Charger les variables d'environnement
 

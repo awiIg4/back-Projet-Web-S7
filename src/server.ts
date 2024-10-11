@@ -18,18 +18,18 @@ import licenceRoutes from './routes/licence';
 import editeurRoutes from './routes/editeur';
 import sessionRoutes from './routes/session';
 import codePromotionRoutes from './routes/codePromotion';
-
+import statsRoutes from './routes/stats'; // Importation des routes stats
 
 // Associer les routes à des chemins spécifiques
 app.use('/api/administrateurs', administrateurRoutes);
 app.use('/api/gestionnaires', gestionnaireRoutes);
 app.use('/api/acheteurs', acheteurRoutes);
 app.use('/api/vendeurs', vendeurRoutes);
-app.use('/api/licences', licenceRoutes); 
-app.use('/api/editeurs', editeurRoutes); 
-app.use('/api/session', sessionRoutes); 
-app.use('/api/codePromotion', codePromotionRoutes); 
-
+app.use('/api/licences', licenceRoutes);
+app.use('/api/editeurs', editeurRoutes);
+app.use('/api/session', sessionRoutes);
+app.use('/api/codePromotion', codePromotionRoutes);
+app.use('/api/stats', statsRoutes); // Association des routes stats
 
 // Connexion à la base de données
 connectDB();
