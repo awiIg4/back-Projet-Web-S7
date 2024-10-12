@@ -1,26 +1,26 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Table, Column, Model, DataType, ForeignKey, HasMany } from 'sequelize-typescript';
 import Utilisateur from './utilisateur';
+import Achat from './achat';
 
-class Acheteur extends Model {
-  public id!: number;
+interface AcheteurAttributes {
+  id: number;
 }
 
-Acheteur.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-    references: {
-      model: Utilisateur,
-      key: 'id',
-    },
-  },
-}, {
-  sequelize,
-  modelName: 'Acheteur',
+interface AcheteurCreationAttributes extends AcheteurAttributes {}
+
+@Table({
   tableName: 'acheteurs',
   timestamps: false,
-});
+})
+export default class Acheteur extends Model<AcheteurAttributes, AcheteurCreationAttributes> implements AcheteurAttributes {
+  @ForeignKey(() => Utilisateur)
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+  })
+  public id!: number;
 
-export default Acheteur;
+  @HasMany(() => Achat, { as: 'achats', foreignKey: 'acheteur_id' })
+  public achats?: Achat[];
+}

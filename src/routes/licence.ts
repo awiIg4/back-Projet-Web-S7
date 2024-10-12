@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import { Op } from 'sequelize';
-import Licence from '../models/licence';
+import Licence, { LicenceCreationAttributes } from '../models/licence'; // Import mis à jour
 import Editeur from '../models/editeur';
 import { isAdministrateur } from './middleware';
 
@@ -22,11 +22,11 @@ router.post('/', isAdministrateur, async (req: Request, res: Response): Promise<
 
     const editeur = await Editeur.findByPk(editeur_id);
     if (!editeur) {
-      res.status(400).send('Editeur introuvable.');
+      res.status(400).send('Éditeur introuvable.');
       return;
     }
 
-    const licence = await Licence.create({ nom, editeur_id });
+    const licence = await Licence.create({ nom, editeur_id } as LicenceCreationAttributes);
     res.status(201).json(licence);
   } catch (error) {
     console.error(error);

@@ -79,7 +79,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       }
   
       // Récupérer le mot de passe depuis la table Administrateur
-      const gestionnaire = await Administrateur.findOne({ where: { utilisateurId: utilisateur.id } });
+      const gestionnaire = await Administrateur.findOne({ where: { id: utilisateur.id } });
       if (!gestionnaire) {
         res.status(400).send('Email ou mot de passe incorrect.');
         return;

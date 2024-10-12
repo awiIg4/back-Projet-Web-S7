@@ -1,3 +1,5 @@
+// src/server.ts
+
 import express from 'express';
 import { config } from 'dotenv';
 import { connectDB } from './models';
@@ -32,10 +34,12 @@ app.use('/api/codePromotion', codePromotionRoutes);
 app.use('/api/stats', statsRoutes); // Association des routes stats
 
 // Connexion à la base de données
-connectDB();
-
-// Démarrer le serveur
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+connectDB().then(() => {
+  // Démarrer le serveur après la connexion à la base de données
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch((err) => {
+  console.error('Failed to connect to the database:', err);
 });

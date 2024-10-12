@@ -1,52 +1,49 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import Utilisateur from './utilisateur';
 import Session from './session';
 
-class Somme extends Model {
-  public id!: number;
-  public utilisateurId!: number;
-  public sessionId!: number;
-  public sommedue!: number;
-  public sommegenerée!: number;
-}
-
-Somme.init({
-  id: {
-    type: DataTypes.INTEGER,
+@Table({
+  tableName: 'sommes',
+  timestamps: false,
+})
+export default class Somme extends Model<Somme> {
+  @Column({
+    type: DataType.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
-  },
-  utilisateurId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Utilisateur,
-      key: 'id',
-    },
-  },
-  sessionId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Session,
-      key: 'id',
-    },
-  },
-  sommedue: {
-    type: DataTypes.DECIMAL,
-    allowNull: false,
-  },
-  sommegenerée: {
-    type: DataTypes.DECIMAL,
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  modelName: 'Somme',
-  tableName: 'sommes',
-  timestamps: false,
-});
+  })
+  public id!: number;
 
-export default Somme;
+  @ForeignKey(() => Utilisateur)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public utilisateurId!: number;
+
+  @BelongsTo(() => Utilisateur)
+  public utilisateur?: Utilisateur;
+
+  @ForeignKey(() => Session)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public sessionId!: number;
+
+  @BelongsTo(() => Session)
+  public session?: Session;
+
+  @Column({
+    type: DataType.DECIMAL,
+    allowNull: false,
+  })
+  public sommedue!: number;
+
+  @Column({
+    type: DataType.DECIMAL,
+    allowNull: false,
+  })
+  public sommegenerée!: number;
+}

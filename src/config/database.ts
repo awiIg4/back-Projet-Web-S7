@@ -1,7 +1,20 @@
 import { Sequelize } from 'sequelize-typescript';
 import { config } from 'dotenv';
 
-config(); // Charger les variables d'environnement
+config();
+
+import Utilisateur from '../models/utilisateur';
+import Vendeur from '../models/vendeur';
+import Acheteur from '../models/acheteur';
+import Licence from '../models/licence';
+import Editeur from '../models/editeur';
+import Jeu from '../models/jeu';
+import Depot from '../models/depot';
+import Session from '../models/session';
+import Somme from '../models/somme';
+import Administrateur from '../models/administrateur';
+import Achat from '../models/achat';
+import CodePromotion from '../models/codePromotion';
 
 const sequelize = new Sequelize({
   database: process.env.DB_NAME,
@@ -10,7 +23,20 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   dialect: 'postgres',
-  models: [__dirname + '/../models'] // Chargement automatique des modèles
+  models: [
+    Utilisateur,
+    Vendeur,
+    Acheteur,
+    Licence,
+    Editeur,
+    Jeu,
+    Depot,
+    Session,
+    Somme,
+    Administrateur,
+    Achat,
+    CodePromotion,
+  ],
 });
 
 export default sequelize;

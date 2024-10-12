@@ -1,37 +1,40 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import Editeur from './editeur';
 
-class Licence extends Model {
-  public id!: number;
-  public nom!: string;
-  public editeur_id!: number;
+export interface LicenceAttributes {
+  id: number;
+  nom: string;
+  editeur_id: number;
 }
 
-Licence.init({
-  id: {
-    type: DataTypes.INTEGER,
+export interface LicenceCreationAttributes extends Omit<LicenceAttributes, 'id'> {}
+
+@Table({
+  tableName: 'licences',
+  timestamps: false,
+})
+export default class Licence extends Model<LicenceAttributes, LicenceCreationAttributes> implements LicenceAttributes {
+  @Column({
+    type: DataType.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
-  },
-  nom: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  editeur_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Editeur,
-      key: 'id',
-    },
-  },
-}, {
-  sequelize,
-  modelName: 'Licence',
-  tableName: 'licences',
-  timestamps: false,
-});
+  })
+  public id!: number;
 
-export default Licence;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  public nom!: string;
+
+  @ForeignKey(() => Editeur)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public editeur_id!: number;
+
+  @BelongsTo(() => Editeur)
+  public editeur?: Editeur;
+}

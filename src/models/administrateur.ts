@@ -1,31 +1,35 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import Utilisateur from './utilisateur';
 
-class Administrateur extends Model {
-  public id!: number;
-  public mot_de_passe!: string;
+interface AdministrateurAttributes {
+  id: number;
+  mot_de_passe: string;
 }
 
-Administrateur.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-    references: {
-      model: Utilisateur,
-      key: 'id',
-    },
-  },
-  mot_de_passe: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  modelName: 'Administrateur',
+interface AdministrateurCreationAttributes extends AdministrateurAttributes {}
+
+@Table({
   tableName: 'administrateurs',
   timestamps: false,
-});
+})
+export default class Administrateur
+  extends Model<AdministrateurAttributes, AdministrateurCreationAttributes>
+  implements AdministrateurAttributes
+{
+  @ForeignKey(() => Utilisateur)
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+  })
+  public id!: number;
 
-export default Administrateur;
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: false,
+  })
+  public mot_de_passe!: string;
+
+  @BelongsTo(() => Utilisateur)
+  public utilisateur?: Utilisateur;
+}

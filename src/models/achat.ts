@@ -1,52 +1,71 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import Jeu from './jeu';
 import Acheteur from './acheteur';
+import CodePromotion from './codePromotion';
 
-class Achat extends Model {
-  public id!: number;
-  public jeu_id!: number;
-  public acheteur_id!: number;
-  public date_transaction!: Date;
-  public commission!: number;
+interface AchatAttributes {
+  id: number;
+  jeu_id: number;
+  acheteur_id: number;
+  date_transaction: Date;
+  commission: number;
+  codePromotionLibele?: string;
 }
 
-Achat.init({
-  id: {
-    type: DataTypes.INTEGER,
+interface AchatCreationAttributes extends Omit<AchatAttributes, 'id'> {}
+
+@Table({
+  tableName: 'achats',
+  timestamps: false,
+})
+export default class Achat extends Model<AchatAttributes, AchatCreationAttributes> implements AchatAttributes {
+  @Column({
+    type: DataType.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
-  },
-  jeu_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Jeu,
-      key: 'id',
-    },
-  },
-  acheteur_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Acheteur,
-      key: 'id',
-    },
-  },
-  date_transaction: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  commission: {
-    type: DataTypes.DECIMAL,
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  modelName: 'Achat',
-  tableName: 'achats',
-  timestamps: false,
-});
+  })
+  public id!: number;
 
-export default Achat;
+  @ForeignKey(() => Jeu)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public jeu_id!: number;
+
+  @BelongsTo(() => Jeu)
+  public jeu?: Jeu;
+
+  @ForeignKey(() => Acheteur)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public acheteur_id!: number;
+
+  @BelongsTo(() => Acheteur)
+  public acheteur?: Acheteur;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  public date_transaction!: Date;
+
+  @Column({
+    type: DataType.DECIMAL,
+    allowNull: false,
+  })
+  public commission!: number;
+
+  @ForeignKey(() => CodePromotion)
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public codePromotionLibele?: string;
+
+  @BelongsTo(() => CodePromotion)
+  public codePromotion?: CodePromotion;
+}

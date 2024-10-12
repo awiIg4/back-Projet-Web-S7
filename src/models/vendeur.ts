@@ -1,30 +1,34 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
-import Utilisateur from './utilisateur';
-import Depot from './depot'
+// src/models/vendeur.ts
 
-class Vendeur extends Model {
-  public id!: number;
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
+import Utilisateur from './utilisateur';
+
+export interface VendeurAttributes {
+  id: number;
 }
 
-Vendeur.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-    references: {
-      model: Utilisateur,
-      key: 'id',
-    },
-  },
-}, {
-  sequelize,
-  modelName: 'Vendeur',
+export interface VendeurCreationAttributes extends VendeurAttributes {}
+
+@Table({
   tableName: 'vendeurs',
   timestamps: false,
-});
+})
+export default class Vendeur extends Model<VendeurAttributes, VendeurCreationAttributes> implements VendeurAttributes {
+  @ForeignKey(() => Utilisateur)
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+  })
+  public id!: number;
 
-// Associations
-Vendeur.hasMany(Depot, { as: 'depots', foreignKey: 'vendeur_id' });
-
-export default Vendeur;
+  @BelongsTo(() => Utilisateur)
+  public utilisateur?: Utilisateur;
+}
