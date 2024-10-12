@@ -14,29 +14,38 @@
 │   │   └── database.ts         # Fichier de configuration Sequelize pour la connexion à PostgreSQL.
 │   │                           # Gère la connexion en utilisant les variables d'environnement du fichier .env.
 │   ├── models                  # Dossier contenant tous les modèles Sequelize
-│   │   ├── utilisateur.ts      # Modèle Sequelize pour la table "utilisateur", représente les utilisateurs de l'application.
+│   │   ├── achat.ts            # Modèle Sequelize pour la table "achat"
+│   │   ├── acheteur.ts         # Modèle Sequelize pour la table "acheteur"
 │   │   ├── administrateur.ts   # Modèle Sequelize pour la table "administrateur".
-│   │   ├── vendeur.ts          # Modèle Sequelize pour la table "vendeur".
-│   │   ├── acheteur.ts         # Modèle Sequelize pour la table "acheteur".
-│   │   ├── jeu.ts              # Modèle Sequelize pour la table "jeu".
+│   │   ├── codePromotion.ts    # Modèle Sequelize pour la table "codePromotion".
+│   │   ├── depot.ts            # Modèle Sequelize pour la table "depot".
 │   │   ├── editeur.ts          # Modèle Sequelize pour la table "editeur".
-│   │   ├── achat.ts            # Modèle Sequelize pour la table "achat".
+│   │   ├── index.ts            # Modèle Sequelize pour la gestion de tout les autres.
+│   │   ├── jeu.ts              # Modèle Sequelize pour la table "jeu".
+│   │   ├── licence.ts          # Modèle Sequelize pour la table "licence".
 │   │   ├── session.ts          # Modèle Sequelize pour la table "session".
-│   │   └── depot.ts            # Modèle Sequelize pour la table "depot".
+│   │   ├── somme.ts            # Modèle Sequelize pour la table "somme".
+│   │   ├── utilisateur.ts      # Modèle Sequelize pour la table "utilisateur".
+│   │   └── vendeur.ts          # Modèle Sequelize pour la table "vendeur".
 │   │                           # Chaque modèle correspond à une table dans la base de données PostgreSQL.
 │   ├── routes                  # Dossier contenant toutes les routes de l'API
-│   │   ├── utilisateur.ts      # Routes HTTP pour gérer les opérations CRUD sur les utilisateurs.
+│   │   ├── acheteur.ts         # Routes HTTP pour gérer les acheteurs.
 │   │   ├── administrateur.ts   # Routes HTTP pour les administrateurs.
-│   │   ├── vendeur.ts          # Routes HTTP pour les vendeurs.
-│   │   ├── acheteur.ts         # Routes HTTP pour les acheteurs.
-│   │   ├── jeu.ts              # Routes HTTP pour les jeux.
+│   │   ├── codePromotion.ts    # Routes HTTP pour les codePromotion.
 │   │   ├── editeur.ts          # Routes HTTP pour les éditeurs.
-│   │   ├── achat.ts            # Routes HTTP pour les achats.
+│   │   ├── gestion.ts          # Routes HTTP pour la partie gestion.
+│   │   ├── gestionnaires.ts    # Routes HTTP pour les gestionnaires.
+│   │   ├── jeu.ts              # Routes HTTP pour les jeux.
+│   │   ├── licence.ts          # Routes HTTP pour les licences.
+│   │   ├── middlware.ts        # Routes HTTP pour les anthentification et la gestion de connection.
 │   │   ├── session.ts          # Routes HTTP pour les sessions.
-│   │   └── depot.ts            # Routes HTTP pour les dépôts.
+│   │   ├── stats.ts            # Routes HTTP pour les statistiques.
+│   │   ├── utilisateur.ts      # Routes HTTP pour gérer les utilisateurs.
+│   │   └── vendeur.ts          # Routes HTTP pour les vendeurs.
 │   │                           # Chaque fichier de route définit les endpoints pour les opérations CRUD sur les modèles correspondants.
 │   └── server.ts               # Fichier principal du serveur, configure et démarre Express.
 │                               # Gère la connexion à la base de données, les middlewares, et importe les routes.
 │
+├──node_modules/                # Stockage de tous les modules utilisés pour le projet.
+│
 └── dist/                       # (Créé après la compilation TypeScript) Contient les fichiers JavaScript compilés depuis src.
-                                # Utilisé en production pour exécuter le serveur.
