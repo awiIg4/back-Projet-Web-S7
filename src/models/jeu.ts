@@ -2,21 +2,34 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, CreatedAt, Updat
 import Depot from './depot';
 import Licence from './licence';
 
+export interface JeuAttributes {
+  id: number;
+  licence_id: number;
+  prix: number;
+  statut: string;
+  depot_id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface JeuCreationAttributes extends Omit<JeuAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+
 @Table({
   tableName: 'jeux',
   timestamps: true,
 })
-export default class Jeu extends Model<Jeu> {
+export default class Jeu extends Model<JeuAttributes, JeuCreationAttributes> implements JeuAttributes {
   @Column({
-    type: DataType.INTEGER.UNSIGNED,
+    type: DataType.INTEGER,
     autoIncrement: true,
     primaryKey: true,
+    allowNull: false,
   })
   public id!: number;
 
   @ForeignKey(() => Licence)
   @Column({
-    type: DataType.INTEGER.UNSIGNED,
+    type: DataType.INTEGER,
     allowNull: false,
   })
   public licence_id!: number;
@@ -38,7 +51,7 @@ export default class Jeu extends Model<Jeu> {
 
   @ForeignKey(() => Depot)
   @Column({
-    type: DataType.INTEGER.UNSIGNED,
+    type: DataType.INTEGER,
     allowNull: false,
   })
   public depot_id!: number;

@@ -18,15 +18,6 @@ interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
-// Middleware pour vérifier si l'utilisateur est gestionnaire
-export function isGestionnaire(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  if (req.user?.typeUtilisateur !== 'gestionnaire') {
-    res.status(403).send('Accès refusé. Vous n\'êtes pas un gestionnaire.');
-    return;
-  }
-  next();
-}
-
 // Route d'inscription pour les gestionnaires
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
     const { nom, email, telephone, adresse, motdepasse } = req.body;

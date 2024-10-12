@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import { Op, Sequelize } from 'sequelize';
-import Jeu from '../models/jeu';
+import Jeu, { JeuCreationAttributes } from '../models/jeu';
 import Licence from '../models/licence';
 import Editeur from '../models/editeur';
 import Vendeur from '../models/vendeur';
@@ -9,8 +9,8 @@ import Depot from '../models/depot';
 import Session from '../models/session';
 import CodePromo from '../models/codePromotion';
 import Acheteur from '../models/acheteur';
-import Somme from '../models/somme'
-import Achat from '../models/achat';
+import Somme, { SommeCreationAttributes } from '../models/somme';
+import Achat, { AchatCreationAttributes } from '../models/achat';
 import { isAdminOrManager } from './middleware';
 
 config(); // Charger les variables d'environnement
@@ -202,11 +202,11 @@ router.post('/deposer', isAdminOrManager, async (req: Request, res: Response): P
       // Créer les jeux en fonction de la quantité pour chaque licence
       for (let i = 0; i < quantite[index]; i++) {
         await Jeu.create({
-          licence_id: licenceId,
+          licence_id: licenceId, // Correction : utiliser licence_id au lieu de id
           prix: prix[index],
           statut: 'récuperable',
           depot_id: depot.id, // Associer directement le jeu au dépôt
-        });
+        } as JeuCreationAttributes); // Assurez-vous d'importer JeuCreationAttributes
       }
     });
 
@@ -392,9 +392,9 @@ router.post('/acheter', isAdminOrManager, async (req: Request, res: Response): P
         : jeu.prix;
 
       // Calculer la commission
-      const commission = session!.commission_en_pourcentage
-        ? (prixApresReduction * session!.valeur_commission) / 100
-        : session!.valeur_commission;
+      const commission = session.commission_en_pourcentage
+        ? (prixApresReduction * session.valeur_commission) / 100
+        : session.valeur_commission;
 
       // Montant dû au vendeur
       const montantDuVendeur = prixApresReduction - commission;
@@ -405,7 +405,7 @@ router.post('/acheter', isAdminOrManager, async (req: Request, res: Response): P
         acheteur_id: acheteur || null,
         date_transaction: today,
         commission: commission,
-      });
+      } as AchatCreationAttributes); // Assurez-vous d'importer AchatCreationAttributes
 
       // Mettre à jour le statut du jeu à 'vendu'
       jeu.statut = 'vendu';
@@ -442,19 +442,19 @@ router.post('/acheter', isAdminOrManager, async (req: Request, res: Response): P
       // Vérifier si une Somme existe déjà pour ce vendeur et cette session
       let somme = await Somme.findOne({
         where: {
-          vendeurId: parseInt(vendeurId, 10),
-          sessionId: session!.id,
+          utilisateurId: parseInt(vendeurId, 10), // Correction : utiliser utilisateurId au lieu de vendeurId
+          sessionId: session.id,
         },
       });
 
       if (!somme) {
         // Créer une nouvelle Somme
         somme = await Somme.create({
-          vendeurId: parseInt(vendeurId, 10),
-          sessionId: session!.id,
+          utilisateurId: parseInt(vendeurId, 10), // Correction : utiliser utilisateurId
+          sessionId: session.id,
           sommedue: sommedue,
           sommegenerée: sommegenerée,
-        });
+        } as SommeCreationAttributes); // Assurez-vous d'importer SommeCreationAttributes
       } else {
         // Mettre à jour la Somme existante
         somme.sommedue += sommedue;
@@ -475,106 +475,106 @@ router.post('/acheter', isAdminOrManager, async (req: Request, res: Response): P
 
 // Route pour consulter la somme due pour un vendeur spécifique
 router.get('/sommedue/:idvendeur', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
-    try {
-      const idvendeur = parseInt(req.params.idvendeur, 10);
-  
-      // Vérifier l'existence du vendeur
-      const vendeur = await Vendeur.findByPk(idvendeur);
-      if (!vendeur) {
-        res.status(404).send('Vendeur introuvable.');
-        return;
-      }
-  
-      // Récupérer la session active
-      const today = new Date();
-      const session = await Session.findOne({
-        where: {
-          date_debut: { [Op.lte]: today },
-          date_fin: { [Op.gte]: today },
-        },
-      });
-  
-      if (!session) {
-        res.status(404).send('Aucune session active trouvée.');
-        return;
-      }
-  
-      // Récupérer la Somme pour le vendeur et la session
-      const somme = await Somme.findOne({
-        where: {
-          vendeurId: idvendeur,
-          sessionId: session.id,
-        },
-      });
-  
-      if (!somme) {
-        res.status(404).send('Aucune somme due pour ce vendeur dans la session actuelle.');
-        return;
-      }
-  
-      res.status(200).json({
-        sommedue: somme.sommedue,
-        sommegenerée: somme.sommegenerée,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Erreur lors de la récupération de la somme due.');
+  try {
+    const idvendeur = parseInt(req.params.idvendeur, 10);
+
+    // Vérifier l'existence du vendeur
+    const vendeur = await Vendeur.findByPk(idvendeur);
+    if (!vendeur) {
+      res.status(404).send('Vendeur introuvable.');
+      return;
     }
-  });
-  
-  // Route pour vider la somme due pour un vendeur spécifique
-  router.put('/sommedue/:idvendeur', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
-    try {
-      const idvendeur = parseInt(req.params.idvendeur, 10);
-  
-      // Vérifier l'existence du vendeur
-      const vendeur = await Vendeur.findByPk(idvendeur);
-      if (!vendeur) {
-        res.status(404).send('Vendeur introuvable.');
-        return;
-      }
-  
-      // Récupérer la session active
-      const today = new Date();
-      const session = await Session.findOne({
-        where: {
-          date_debut: { [Op.lte]: today },
-          date_fin: { [Op.gte]: today },
-        },
-      });
-  
-      if (!session) {
-        res.status(404).send('Aucune session active trouvée.');
-        return;
-      }
-  
-      // Récupérer la Somme pour le vendeur et la session
-      const somme = await Somme.findOne({
-        where: {
-          vendeurId: idvendeur,
-          sessionId: session.id,
-        },
-      });
-  
-      if (!somme) {
-        res.status(404).send('Aucune somme due pour ce vendeur dans la session actuelle.');
-        return;
-      }
-  
-      const montantRemboursé = somme.sommedue;
-  
-      // Vider la somme due
-      somme.sommedue = 0;
-      await somme.save();
-  
-      res.status(200).json({
-        message: 'Somme due remboursée avec succès.',
-        montantRemboursé: montantRemboursé,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Erreur lors du remboursement de la somme due.');
+
+    // Récupérer la session active
+    const today = new Date();
+    const session = await Session.findOne({
+      where: {
+        date_debut: { [Op.lte]: today },
+        date_fin: { [Op.gte]: today },
+      },
+    });
+
+    if (!session) {
+      res.status(404).send('Aucune session active trouvée.');
+      return;
     }
-  });
+
+    // Récupérer la Somme pour le vendeur et la session
+    const somme = await Somme.findOne({
+      where: {
+        utilisateurId: idvendeur, // Correction : utiliser utilisateurId au lieu de vendeurId
+        sessionId: session.id,
+      },
+    });
+
+    if (!somme) {
+      res.status(404).send('Aucune somme due pour ce vendeur dans la session actuelle.');
+      return;
+    }
+
+    res.status(200).json({
+      sommedue: somme.sommedue,
+      sommegenerée: somme.sommegenerée,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors de la récupération de la somme due.');
+  }
+});
+
+// Route pour vider la somme due pour un vendeur spécifique
+router.put('/sommedue/:idvendeur', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idvendeur = parseInt(req.params.idvendeur, 10);
+
+    // Vérifier l'existence du vendeur
+    const vendeur = await Vendeur.findByPk(idvendeur);
+    if (!vendeur) {
+      res.status(404).send('Vendeur introuvable.');
+      return;
+    }
+
+    // Récupérer la session active
+    const today = new Date();
+    const session = await Session.findOne({
+      where: {
+        date_debut: { [Op.lte]: today },
+        date_fin: { [Op.gte]: today },
+      },
+    });
+
+    if (!session) {
+      res.status(404).send('Aucune session active trouvée.');
+      return;
+    }
+
+    // Récupérer la Somme pour le vendeur et la session
+    const somme = await Somme.findOne({
+      where: {
+        utilisateurId: idvendeur, // Correction : utiliser utilisateurId au lieu de vendeurId
+        sessionId: session.id,
+      },
+    });
+
+    if (!somme) {
+      res.status(404).send('Aucune somme due pour ce vendeur dans la session actuelle.');
+      return;
+    }
+
+    const montantRemboursé = somme.sommedue;
+
+    // Vider la somme due
+    somme.sommedue = 0;
+    await somme.save();
+
+    res.status(200).json({
+      message: 'Somme due remboursée avec succès.',
+      montantRemboursé: montantRemboursé,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors du remboursement de la somme due.');
+  }
+});
 
 export default router;

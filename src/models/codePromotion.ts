@@ -1,5 +1,3 @@
-// src/models/codePromotion.ts
-
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 export interface CodePromotionAttributes {

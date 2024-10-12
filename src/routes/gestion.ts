@@ -1,5 +1,3 @@
-// src/routes/gestion.ts
-
 import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import { Op, Sequelize } from 'sequelize';
@@ -15,6 +13,230 @@ import { isAdminOrManager } from './middleware';
 config(); // Charger les variables d'environnement
 
 const router = express.Router();
+
+// Route GET /gestion/games/:numpage
+router.get('/games/:numpage', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { numpage } = req.params;
+    const page = parseInt(numpage, 10) || 1;
+    const limit = 50; // Nombre de résultats par page
+    const offset = (page - 1) * limit;
+
+    // Récupérer la session actuelle ou la plus récente
+    const today = new Date();
+    let session = await Session.findOne({
+      where: {
+        date_debut: { [Op.lte]: today },
+        date_fin: { [Op.gte]: today },
+      },
+    });
+
+    if (!session) {
+      // Si aucune session active, récupérer la plus récente
+      session = await Session.findOne({
+        order: [['date_fin', 'DESC']],
+      });
+
+      if (!session) {
+        res.status(404).send('Aucune session disponible.');
+        return;
+      }
+    }
+
+    // Récupérer les jeux vendus lors de la session
+    const jeuxVendus = await Jeu.findAll({
+      where: {
+        statut: 'vendu',
+        updatedAt: {
+          [Op.between]: [session.date_debut, session.date_fin],
+        },
+      },
+      include: [
+        {
+          model: Licence,
+          as: 'licence',
+          attributes: ['id', 'nom', 'editeur_id'],
+          include: [
+            {
+              model: Editeur,
+              as: 'editeur',
+              attributes: ['id', 'nom'],
+            },
+          ],
+        },
+      ],
+      attributes: [
+        [Sequelize.col('licence->editeur.nom'), 'editeur_nom'],
+        [Sequelize.col('licence.nom'), 'licence_nom'],
+        [Sequelize.fn('COUNT', Sequelize.col('Jeu.id')), 'quantite_vendue'],
+      ],
+      group: ['licence->editeur.nom', 'licence.nom'],
+      order: [
+        [Sequelize.col('editeur_nom'), 'ASC'],
+        [Sequelize.col('licence_nom'), 'ASC'],
+      ],
+      limit,
+      offset,
+    });
+
+    res.status(200).json(jeuxVendus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors de la récupération des jeux vendus.');
+  }
+});
+
+// Route GET /gestion/vendeurs/:numpage
+router.get('/vendeurs/:numpage', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { numpage } = req.params;
+    const { vendeur_id } = req.query; // Vendeur ID passé en paramètre optionnel
+    const page = parseInt(numpage, 10) || 1;
+    const limit = 50; // Nombre de résultats par page
+    const offset = (page - 1) * limit;
+
+    // Récupérer la session actuelle ou la plus récente
+    const today = new Date();
+    let session = await Session.findOne({
+      where: {
+        date_debut: { [Op.lte]: today },
+        date_fin: { [Op.gte]: today },
+      },
+    });
+
+    if (!session) {
+      // Si aucune session active, récupérer la plus récente
+      session = await Session.findOne({
+        order: [['date_fin', 'DESC']],
+      });
+
+      if (!session) {
+        res.status(404).send('Aucune session disponible.');
+        return;
+      }
+    }
+
+    // Construire la clause WHERE
+    const whereClause: any = {
+      statut: 'vendu',
+      updatedAt: {
+        [Op.between]: [session.date_debut, session.date_fin],
+      },
+    };
+
+    if (vendeur_id) {
+      whereClause.vendeur_id = vendeur_id;
+    }
+
+    // Récupérer les jeux vendus lors de la session, groupés par vendeur, éditeur et licence
+    const jeuxVendus = await Jeu.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Vendeur,
+          as: 'vendeur',
+          attributes: ['id', 'nom'],
+        },
+        {
+          model: Licence,
+          as: 'licence',
+          attributes: ['id', 'nom', 'editeur_id'],
+          include: [
+            {
+              model: Editeur,
+              as: 'editeur',
+              attributes: ['id', 'nom'],
+            },
+          ],
+        },
+      ],
+      attributes: [
+        [Sequelize.col('vendeur.nom'), 'vendeur_nom'],
+        [Sequelize.col('licence->editeur.nom'), 'editeur_nom'],
+        [Sequelize.col('licence.nom'), 'licence_nom'],
+        [Sequelize.fn('COUNT', Sequelize.col('Jeu.id')), 'quantite_vendue'],
+      ],
+      group: ['vendeur.nom', 'licence->editeur.nom', 'licence.nom'],
+      order: [
+        [Sequelize.col('vendeur_nom'), 'ASC'],
+        [Sequelize.col('editeur_nom'), 'ASC'],
+        [Sequelize.col('licence_nom'), 'ASC'],
+      ],
+      limit,
+      offset,
+    });
+
+    res.status(200).json(jeuxVendus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors de la récupération des jeux vendus.');
+  }
+});
+
+// Nouvelle route GET /gestion/bilan
+router.get('/bilan', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Récupérer la session actuelle ou la plus récente
+    const today = new Date();
+    let session = await Session.findOne({
+      where: {
+        date_debut: { [Op.lte]: today },
+        date_fin: { [Op.gte]: today },
+      },
+    });
+
+    if (!session) {
+      // Si aucune session active, récupérer la plus récente
+      session = await Session.findOne({
+        order: [['date_fin', 'DESC']],
+      });
+
+      if (!session) {
+        res.status(404).send('Aucune session disponible.');
+        return;
+      }
+    }
+
+    // Récupérer les sommes pour tous les vendeurs pour la session
+    const sommes = await Somme.findAll({
+      where: {
+        sessionId: session.id,
+      },
+    });
+
+    if (sommes.length === 0) {
+      res.status(404).send('Aucune donnée financière pour cette session.');
+      return;
+    }
+
+    // Calculer les montants totaux
+    let totalGeneréParVendeurs = 0;
+    let totalDûAuxVendeurs = 0;
+
+    sommes.forEach((somme) => {
+      totalGeneréParVendeurs += parseFloat(somme.sommegenerée.toString());
+      totalDûAuxVendeurs += parseFloat(somme.sommedue.toString());
+    });
+
+    const argentGénéréPourAdmin = totalGeneréParVendeurs - totalDûAuxVendeurs;
+
+    res.status(200).json({
+      session: {
+        id: session.id,
+        date_debut: session.date_debut,
+        date_fin: session.date_fin,
+      },
+      bilan: {
+        total_generé_par_vendeurs: totalGeneréParVendeurs.toFixed(2),
+        total_dû_aux_vendeurs: totalDûAuxVendeurs.toFixed(2),
+        argent_généré_pour_admin: argentGénéréPourAdmin.toFixed(2),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors de la récupération du bilan financier.');
+  }
+});
 
 // Route GET /gestion/bilan/:idvendeur
 router.get('/bilan/:idvendeur', isAdminOrManager, async (req: Request, res: Response): Promise<void> => {
@@ -91,7 +313,5 @@ router.get('/bilan/:idvendeur', isAdminOrManager, async (req: Request, res: Resp
     res.status(500).send('Erreur lors de la récupération du bilan financier.');
   }
 });
-
-// Les autres routes restent inchangées
 
 export default router;

@@ -2,11 +2,23 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize
 import Utilisateur from './utilisateur';
 import Session from './session';
 
+// Définir et exporter les interfaces des attributs
+export interface SommeAttributes {
+  id: number;
+  utilisateurId: number;
+  sessionId: number;
+  sommedue: number;
+  sommegenerée: number;
+}
+
+export interface SommeCreationAttributes extends Omit<SommeAttributes, 'id'> {}
+
+// Définir le modèle avec les interfaces
 @Table({
   tableName: 'sommes',
   timestamps: false,
 })
-export default class Somme extends Model<Somme> {
+export default class Somme extends Model<SommeAttributes, SommeCreationAttributes> implements SommeAttributes {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,

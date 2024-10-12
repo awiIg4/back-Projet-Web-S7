@@ -1,13 +1,4 @@
-// src/models/vendeur.ts
-
-import {
-  Table,
-  Column,
-  Model,
-  DataType,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey,  BelongsTo } from 'sequelize-typescript';
 import Utilisateur from './utilisateur';
 
 export interface VendeurAttributes {

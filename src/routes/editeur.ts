@@ -82,7 +82,7 @@ router.get('/search/:query', async (req: Request, res: Response): Promise<void> 
     const editeurs = await Editeur.findAll({
       where: {
         nom: {
-          [Op.iLike]: `${query}%` // Recherche insensible à la casse et aux accents
+          [Op.iLike]: `${query}%`
         }
       },
       limit: 5

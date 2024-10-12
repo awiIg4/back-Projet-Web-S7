@@ -1,10 +1,22 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
+interface SessionAttributes {
+  id: number;
+  date_debut: Date;
+  date_fin: Date;
+  valeur_commission: number;
+  commission_en_pourcentage: boolean;
+  valeur_frais_depot: number;
+  frais_depot_en_pourcentage: boolean;
+}
+
+interface SessionCreationAttributes extends Omit<SessionAttributes, 'id'> {}
+
 @Table({
   tableName: 'sessions',
   timestamps: false,
 })
-export default class Session extends Model<Session> {
+export default class Session extends Model<SessionAttributes, SessionCreationAttributes> {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,

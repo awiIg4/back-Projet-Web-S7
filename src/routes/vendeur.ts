@@ -1,6 +1,4 @@
-// src/routes/vendeur.ts
-
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import { config } from 'dotenv';
 import { Op, fn, col } from 'sequelize';
 import sequelize from '../config/database';
@@ -26,7 +24,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Route pour créer un vendeur avec un email unique
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
+router.post('/register', async (req: Request, res: Response): Promise<void> => { 
   const { nom, email, telephone, adresse } = req.body;
 
   try {
@@ -58,21 +56,89 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// Route pour charger un vendeur grâce à son email
+router.get('/:email', async (req: Request, res: Response): Promise<void> => { 
+  const { email } = req.params;
+
+  try {
+    const utilisateur = await Utilisateur.findOne({
+      where: { email, type_utilisateur: 'vendeur' },
+      include: [{ model: Vendeur, as: 'vendeur' }],
+    });
+
+    if (!utilisateur) {
+      res.status(404).send('Vendeur non trouvé.');
+      return;
+    }
+
+    res.status(200).json(utilisateur);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur lors du chargement du vendeur.');
+  }
+});
+
+// Route pour récupérer les informations d'un vendeur (nom, email, téléphone, adresse)
+router.get('/informations/:id', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => { 
+    const { id } = req.params;
+
+    try {
+      const utilisateur = await Utilisateur.findByPk(id, {
+        attributes: ['id', 'nom', 'email', 'telephone', 'adresse'],
+        include: [{ model: Vendeur, as: 'vendeur' }],
+      });
+
+      if (!utilisateur) {
+        res.status(404).send('Vendeur non trouvé.');
+        return;
+      }
+
+      res.status(200).json(utilisateur);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erreur lors de la récupération des informations du vendeur.');
+    }
+  }
+);
+
 // Route pour récupérer les jeux vendus et en vente pour une session
-router.get(
-  '/stock/:idsession',
-  isAdminOrManager,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/stock/:idsession',isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => { 
     const idsession = Number(req.params.idsession);
     const numpage = Number(req.query.numpage) || 1;
 
     if (isNaN(idsession) || isNaN(numpage)) {
       res.status(400).send('idsession ou numpage invalide.');
-      return;
     }
 
     try {
-      // Votre logique ici
+      const jeux = await Jeu.findAll({
+        where: {
+          statut: {
+            [Op.in]: ['en vente', 'vendu'],
+          },
+        },
+        include: [
+          {
+            model: Depot,
+            as: 'depot',
+            required: true,
+            include: [
+              {
+                model: Session,
+                as: 'session',
+                required: true,
+                where: {
+                  id: idsession,
+                },
+              },
+            ],
+          },
+        ],
+        limit: 10,
+        offset: (numpage - 1) * 10,
+      });
+
+      res.status(200).json(jeux);
     } catch (error) {
       console.error(error);
       res.status(500).send('Erreur lors de la récupération des jeux pour la session.');
@@ -81,20 +147,29 @@ router.get(
 );
 
 // Route pour récupérer la somme due au vendeur pour une session
-router.get(
-  '/sommedue/:idsession',
-  isAdminOrManager,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/sommedue/:idsession', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => { 
     const idsession = Number(req.params.idsession);
     const idvendeur = Number(req.query.idvendeur);
 
     if (isNaN(idsession) || isNaN(idvendeur)) {
       res.status(400).send('idsession ou idvendeur invalide.');
-      return;
     }
 
     try {
-      // Votre logique ici
+      const somme = await Somme.findOne({
+        where: {
+          utilisateurId: idvendeur,
+          sessionId: idsession,
+        },
+        attributes: ['sommedue'],
+      });
+
+      if (!somme) {
+        res.status(404).send('Aucune somme due trouvée pour cette session.');
+        return;
+      }
+
+      res.status(200).json({ sommedue: somme.sommedue });
     } catch (error) {
       console.error(error);
       res.status(500).send('Erreur lors de la récupération de la somme due.');
@@ -103,20 +178,28 @@ router.get(
 );
 
 // Route pour récupérer l'argent généré par les ventes pour une session
-router.get(
-  '/argentgagne/:idsession',
-  isAdminOrManager,
-  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/argentgagne/:idsession', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const idsession = Number(req.params.idsession);
     const idvendeur = Number(req.query.idvendeur);
 
     if (isNaN(idsession) || isNaN(idvendeur)) {
       res.status(400).send('idsession ou idvendeur invalide.');
-      return;
     }
 
     try {
-      // Votre logique ici
+      const somme = await Somme.findOne({
+        where: {
+          utilisateurId: idvendeur,
+          sessionId: idsession,
+        },
+        attributes: ['sommegenerée'],
+      });
+
+      if (!somme) {
+        res.status(404).send('Aucune somme générée trouvée pour cette session.');
+      } else {
+        res.status(200).json({ sommegenerée: somme.sommegenerée });
+      }
     } catch (error) {
       console.error(error);
       res.status(500).send("Erreur lors de la récupération de l'argent généré.");
@@ -124,6 +207,33 @@ router.get(
   }
 );
 
-// Les autres routes restent inchangées
+// Route pour récupérer les statistiques des jeux vendus par licence
+router.get('/stats', isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const stats = await Jeu.findAll({
+        where: {
+          statut: 'vendu',
+        },
+        attributes: [
+          'licenceId',
+          [sequelize.fn('COUNT', sequelize.col('id')), 'quantiteVendu'],
+        ],
+        include: [
+          {
+            model: Licence,
+            as: 'licence',
+            attributes: ['nom'],
+          },
+        ],
+        group: ['licenceId', 'licence.nom'],
+      });
+
+      res.status(200).json(stats);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erreur lors de la récupération des statistiques des jeux vendus.');
+    }
+  }
+);
 
 export default router;

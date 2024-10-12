@@ -3,7 +3,7 @@ import Jeu from './jeu';
 import Acheteur from './acheteur';
 import CodePromotion from './codePromotion';
 
-interface AchatAttributes {
+export interface AchatAttributes {
   id: number;
   jeu_id: number;
   acheteur_id: number;
@@ -12,7 +12,7 @@ interface AchatAttributes {
   codePromotionLibele?: string;
 }
 
-interface AchatCreationAttributes extends Omit<AchatAttributes, 'id'> {}
+export interface AchatCreationAttributes extends Omit<AchatAttributes, 'id'> {}
 
 @Table({
   tableName: 'achats',
