@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  projetweb_s7_back:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: projetweb_s7_back
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      SERVER_PORT: ${SERVER_PORT}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      NODE_ENV: ${NODE_ENV}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - projetweb_s7_db
+    networks:
+      - projetweb_s7_network
+
+  projetweb_s7_back_test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: projetweb_s7_back_test
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      SERVER_PORT: ${SERVER_PORT}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      NODE_ENV: test
+    command: ["npm", "test"]
+    depends_on:
+      - projetweb_s7_db
+    networks:
+      - projetweb_s7_network
+
+networks:
+  projetweb_s7_network:
+    external: true
