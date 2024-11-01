@@ -2,13 +2,18 @@ import express from 'express';
 import { config } from 'dotenv';
 import { connectDB } from './models';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+
 
 config(); // Charger les variables d'environnement
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(cors({
+    origin: 'http://localhost:4200', // TODO: Utiliser une variable d'environnement pour l'URL
+    credentials: true, 
+  }));
 // Importer les routes
 import administrateurRoutes from './routes/administrateur';
 import gestionnaireRoutes from './routes/gestionnaire';

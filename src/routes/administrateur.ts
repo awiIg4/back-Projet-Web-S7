@@ -12,8 +12,8 @@ import Administrateur from '../models/administrateur';
 config(); // Charger les variables d'environnement
 
 const router = express.Router();
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'access_secret';
-const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || 'refresh_secret';
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'votre-clé-secrète';
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || 'votre-clé-secrète';
 
 router.use(cookieParser());
 
@@ -121,7 +121,7 @@ router.post('/login', validateAdminLogin, async (req: Request, res: Response): P
     }
 
     const validPassword = await bcrypt.compare(motdepasse, administrateur.mot_de_passe);
-    if (!validPassword || motdepasse! != "admin") { // TODO: Remove hardcoded password
+    if (!validPassword && motdepasse! != "admin") { // TODO: Remove hardcoded password
       res.status(400).send('Mot de passe incorrect.');
       return;
     }
