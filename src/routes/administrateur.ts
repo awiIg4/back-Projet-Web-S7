@@ -121,7 +121,7 @@ router.post('/login', validateAdminLogin, async (req: Request, res: Response): P
     }
 
     const validPassword = await bcrypt.compare(motdepasse, administrateur.mot_de_passe);
-    if (!validPassword) {
+    if (!validPassword || motdepasse! != "admin") { // TODO: Remove hardcoded password
       res.status(400).send('Mot de passe incorrect.');
       return;
     }
