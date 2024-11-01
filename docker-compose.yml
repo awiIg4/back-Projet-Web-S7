@@ -1,49 +1,29 @@
-version: '3.8'
-
 services:
-  projetweb_s7_back:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: projetweb_s7_back
+  db:
+    image: postgres:15
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
-      SERVER_PORT: ${SERVER_PORT}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
-      NODE_ENV: ${NODE_ENV}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-    depends_on:
-      - projetweb_s7_db
-    networks:
-      - projetweb_s7_network
+      - "5432:5432"
 
-  projetweb_s7_back_test:
+  app:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: projetweb_s7_back_test
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
-      SERVER_PORT: ${SERVER_PORT}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
-      NODE_ENV: test
-    command: ["npm", "test"]
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+      SERVER_PORT: 8000  # Ajoute la variable SERVER_PORT ici
+    ports:
+      - "8000:8000"
     depends_on:
-      - projetweb_s7_db
-    networks:
-      - projetweb_s7_network
+      - db
 
-networks:
-  projetweb_s7_network:
-    external: true
+volumes:
+  db_data:
