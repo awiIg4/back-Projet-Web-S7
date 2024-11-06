@@ -1,18 +1,18 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
-import app from '../src/server';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Acheteur from '../src/models/acheteur';
-import Vendeur from '../src/models/vendeur';
-import Depot from '../src/models/depot';
-import Jeu from '../src/models/jeu';
-import SessionModel from '../src/models/session';
-import Editeur from '../src/models/editeur';
-import Licence from '../src/models/licence';
-import CodePromo from '../src/models/codePromotion';
-import Somme from '../src/models/somme';
-import Achat from '../src/models/achat';
+import app from '../server';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Acheteur from '../models/acheteur';
+import Vendeur from '../models/vendeur';
+import Depot from '../models/depot';
+import Jeu from '../models/jeu';
+import SessionModel from '../models/session';
+import Editeur from '../models/editeur';
+import Licence from '../models/licence';
+import CodePromo from '../models/codePromotion';
+import Somme from '../models/somme';
+import Achat from '../models/achat';
 import { Op } from 'sequelize';
 
 describe('Routes Jeux', () => {

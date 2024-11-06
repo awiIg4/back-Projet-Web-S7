@@ -1,17 +1,17 @@
 import request from 'supertest';
 import bcrypt from 'bcrypt';
-import app from '../src/server';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Licence from '../src/models/licence';
-import Editeur from '../src/models/editeur';
-import Jeu from '../src/models/jeu';
-import Vendeur from '../src/models/vendeur';
-import Achat from '../src/models/achat';
-import Acheteur from '../src/models/acheteur';
-import Depot from '../src/models/depot';
-import Session from '../src/models/session';
-import Somme from '../src/models/somme';
+import app from '../server';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Licence from '../models/licence';
+import Editeur from '../models/editeur';
+import Jeu from '../models/jeu';
+import Vendeur from '../models/vendeur';
+import Achat from '../models/achat';
+import Acheteur from '../models/acheteur';
+import Depot from '../models/depot';
+import Session from '../models/session';
+import Somme from '../models/somme';
 import { format, addHours } from 'date-fns';
 
 describe('Stat Routes', () => {

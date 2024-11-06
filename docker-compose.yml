@@ -19,11 +19,26 @@ services:
       DB_USER: user
       DB_PASSWORD: password
       DB_NAME: database
-      SERVER_PORT: 8000  # Ajoute la variable SERVER_PORT ici
+      SERVER_PORT: 8000 
     ports:
       - "8000:8000"
     depends_on:
       - db
+    command: node dist/index.js
+
+  app_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: tester
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+    depends_on:
+      - db
+    command: npm test
 
 volumes:
   db_data:

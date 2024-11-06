@@ -1,9 +1,9 @@
 import request from 'supertest';
 import bcrypt from 'bcrypt';
-import app from '../src/server';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Session from '../src/models/session';
+import app from '../server';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Session from '../models/session';
 
 describe('Session Routes', () => {
   let accessToken: string;

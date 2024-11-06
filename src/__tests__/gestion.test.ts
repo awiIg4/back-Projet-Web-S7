@@ -1,17 +1,17 @@
 import request from 'supertest';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import app from '../src/server';
+import app from '../server';
 import { Op, Sequelize } from 'sequelize';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Vendeur from '../src/models/vendeur';
-import Licence from '../src/models/licence';
-import Editeur from '../src/models/editeur';
-import Jeu from '../src/models/jeu';
-import Depot from '../src/models/depot';
-import Session from '../src/models/session';
-import Somme from '../src/models/somme';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Vendeur from '../models/vendeur';
+import Licence from '../models/licence';
+import Editeur from '../models/editeur';
+import Jeu from '../models/jeu';
+import Depot from '../models/depot';
+import Session from '../models/session';
+import Somme from '../models/somme';
 
 describe('Gestion Routes', () => {
   let accessTokenGestionnaire: string;

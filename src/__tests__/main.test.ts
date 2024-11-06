@@ -1,4 +1,4 @@
-import sequelize from '../src/config/database';
+import sequelize from '../config/database';
 describe('Exécuter tous les tests', () => {
   // Avant d'exécuter TOUS les tests
   beforeAll(async () => {

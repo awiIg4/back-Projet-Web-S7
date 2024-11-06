@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
-import app from '../src/server';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Editeur from '../src/models/editeur';
+import app from '../server';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Editeur from '../models/editeur';
 
 describe('Éditeur Routes', () => {
   let accessToken: string;

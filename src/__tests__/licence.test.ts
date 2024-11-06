@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
-import app from '../src/server';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Licence from '../src/models/licence';
-import Editeur from '../src/models/editeur';
-import sequelize from '../src/config/database';
+import app from '../server';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Licence from '../models/licence';
+import Editeur from '../models/editeur';
+import sequelize from '../config/database';
 
 describe('Licence Routes', () => {
   let accessToken: string;

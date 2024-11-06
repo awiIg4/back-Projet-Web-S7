@@ -1,9 +1,9 @@
 import request from 'supertest';
-import app from '../src/server';
+import app from '../server';
 import bcrypt from 'bcrypt';
-import Utilisateur from '../src/models/utilisateur';
-import Administrateur from '../src/models/administrateur';
-import Acheteur from '../src/models/acheteur';
+import Utilisateur from '../models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Acheteur from '../models/acheteur';
 
 describe('Routes Utilisateurs', () => {
   let adminAccessToken: string;
