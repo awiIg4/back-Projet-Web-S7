@@ -304,7 +304,7 @@ describe('Stat Routes', () => {
         console.log('Réponse pour /stats/jeux:', res.body);
 
       expect(Array.isArray(res.body)).toBe(true);
-      const currentHour = format(addHours(new Date(), -1), 'yyyy-MM-dd HH:00:00');
+      const currentHour = format(new Date(), 'yyyy-MM-dd HH:00:00');
       const statsHeure1 = res.body.find((stat: any) => stat.heure === currentHour);
       if (!statsHeure1) {
         throw new Error(`Aucune donnée trouvée pour l'heure: ${currentHour}`);

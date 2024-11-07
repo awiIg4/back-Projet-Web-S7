@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # Service de base de données commun à tous les profils
   db:
     image: postgres:15
     environment:
@@ -10,35 +13,69 @@ services:
     ports:
       - "5432:5432"
 
-  app:
+  # Service de l'application pour le développement
+  app_dev:
+    profiles:
+      - dev
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
+      NODE_ENV: development
       DB_HOST: db
       DB_USER: user
       DB_PASSWORD: password
       DB_NAME: database
-      SERVER_PORT: 8000 
+      SERVER_PORT: 8000
+      ACCESS_TOKEN_SECRET: votre-clé-secrète
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: npm run dev
+
+  # Service de l'application pour les tests
+  app_test:
+    profiles:
+      - test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      NODE_ENV: test
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+      ACCESS_TOKEN_SECRET: votre-clé-secrète
+    depends_on:
+      - db
+    command: npm test
+
+
+  # Service de l'application pour la production
+  app_prod:
+    profiles:
+      - prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+      SERVER_PORT: 8000
+      ACCESS_TOKEN_SECRET: votre-clé-secrète
     ports:
       - "8000:8000"
     depends_on:
       - db
     command: node dist/index.js
 
-  app_test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: tester
-    environment:
-      DB_HOST: db
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_NAME: database
-    depends_on:
-      - db
-    command: npm test
 
 volumes:
   db_data:

@@ -1,0 +1,22 @@
+# Dockerfile.test
+
+# Utiliser l'image Node.js appropriée
+FROM node:18-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
+
+# Installer toutes les dépendances (y compris de développement)
+RUN npm install
+
+# Copier le reste du code source
+COPY . .
+
+# Exposer le port de l'application (optionnel)
+EXPOSE 8000
+
+# Commande pour exécuter les tests
+CMD ["npm", "test"]
