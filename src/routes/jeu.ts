@@ -170,7 +170,7 @@ router.post('/deposer', authenticateToken, isAdminOrManager,
       .custom((prix: any[]) => prix.every(p => typeof p === 'number' && p >= 0))
       .withMessage('Chaque prix doit être un nombre positif ou nul.'),
     body('code_promo')
-      .optional()
+      .optional({ nullable: true })
       .isString().withMessage('Le champ code_promo doit être une chaîne de caractères.'),
     body('id_vendeur')
       .exists().withMessage('Le champ id_vendeur est requis.')
