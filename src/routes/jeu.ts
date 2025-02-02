@@ -151,6 +151,35 @@ router.get('/rechercher',
   }
 );
 
+// Route pour trouver les jeux à mettre en rayon
+router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const jeux = await Jeu.findAll({
+      where: {
+        statut: 'récuperable',
+      },
+      include: [
+        {
+          model: Depot,
+          as: 'depot',
+          include: [
+            {
+              model: Vendeur,
+              as: 'vendeur',
+            },
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(jeux);
+  } catch (error) {
+    console.error('Erreur lors de la recherche des jeux à mettre en rayon:', error);
+    res.status(500).send('Erreur lors de la recherche des jeux à mettre en rayon.');
+  }
+});
+
+
 // Route pour déposer des jeux pour un vendeur 
 router.post('/deposer', authenticateToken, isAdminOrManager,
   [
