@@ -418,10 +418,10 @@ router.post('/acheter', authenticateToken, isAdminOrManager,
       .custom((jeux_a_acheter: any[]) => jeux_a_acheter.every(id => Number.isInteger(id) && id > 0))
       .withMessage('Chaque jeu_id dans jeux_a_acheter doit être un entier positif.'),
     body('code_promo')
-      .optional()
+      .optional( { nullable: true })
       .isString().withMessage('Le champ code_promo doit être une chaîne de caractères.'),
     body('acheteur')
-      .optional()
+      .optional( { nullable: true })
       .isInt({ min: 1 }).withMessage('Le champ acheteur doit être un entier positif.'),
   ],
   handleValidationErrors,

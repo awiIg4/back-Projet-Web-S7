@@ -5,7 +5,7 @@ import { body, param, validationResult } from 'express-validator';
 import Licence from '../models/licence';
 import Editeur from '../models/editeur';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
+import { isAdministrateur, isAdminOrManager } from '../middleware/authorization';
 
 config(); // Charger les variables d'environnement
 
@@ -88,7 +88,7 @@ router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRe
 );
 
 // Route pour récupérer une licence par son ID (Administrateur uniquement)
-router.get('/:id', authenticateToken, isAdministrateur, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:id', authenticateToken, isAdminOrManager, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
