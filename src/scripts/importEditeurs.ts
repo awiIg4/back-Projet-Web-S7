@@ -7,6 +7,7 @@ export async function importEditeurs() {
   const editeursFile = path.join(__dirname, '../data/editeurs.csv');
 
   if (!fs.existsSync(editeursFile)) {
+    console.log(`📂 Chemin du fichier attendu : ${editeursFile}`);
     console.error('❌ Fichier editeurs.csv introuvable !');
     return;
   }
