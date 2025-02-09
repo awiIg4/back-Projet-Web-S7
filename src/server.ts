@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuration CORS mise à jour
+// Configuration CORS
 app.use(cors({
     origin: [
       'http://localhost:4200', 
@@ -46,7 +46,7 @@ import gestionRoutes from './routes/gestion';
 
 // Route de test
 app.get('/', (req, res) => {
-  console.log('Root route hit');
+  console.log('✅ API Root - Server is running');
   res.status(200).send('API Root Route - Server is running');
 });
 
@@ -66,33 +66,27 @@ app.use('/api/utilisateurs', utilisateurRoutes);
 
 // Route 404
 app.use('*', (req, res) => {
-  console.log('404 - Route not found:', req.originalUrl);
+  console.log('⚠️ 404 - Route not found:', req.originalUrl);
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Démarrage du serveur avec connexion à la base et exécution du seeder
-const PORT = Number(process.env.PORT) || 8000;
-
-const startServer = async () => {
+// Synchronisation de la base de données
+async function setupDatabase() {
   try {
-    console.log('🔄 Connecting to database...');
-    await sequelize.authenticate(); // Vérifie la connexion à la base
-    console.log('✅ Database connected.');
+    console.log('🔄 Syncing database...');
+    await sequelize.sync();
+    console.log('✅ Database sync complete.');
 
     console.log('🌱 Running database seeder...');
-    await runSeeder(); // Exécute le seeder
+    await runSeeder();
     console.log('✅ Database seeding completed.');
-
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('❌ Error during database setup:', error);
     process.exit(1);
   }
-};
+}
 
-startServer();
+// Lancer le setup de la base en arrière-plan (évite de bloquer l’exécution du serveur)
+setupDatabase();
 
 export default app;
