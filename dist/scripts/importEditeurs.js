@@ -11,6 +11,7 @@ const editeur_1 = __importDefault(require("../models/editeur"));
 async function importEditeurs() {
     const editeursFile = path_1.default.join(__dirname, '../data/editeurs.csv');
     if (!fs_1.default.existsSync(editeursFile)) {
+        console.log(`📂 Chemin du fichier attendu : ${editeursFile}`);
         console.error('❌ Fichier editeurs.csv introuvable !');
         return;
     }

@@ -18,12 +18,12 @@ app.use((req, res, next) => {
 });
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-// Configuration CORS mise à jour
+// Configuration CORS
 app.use((0, cors_1.default)({
     origin: [
-        'http://localhost:4200', // Pour le développement local
-        'https://awi-86d26c373fe5.herokuapp.com', // Frontend sur Heroku
-        'https://back-projet-web-s7-21ead7148147.herokuapp.com' // Backend sur Heroku
+        'http://localhost:4200',
+        'https://awi-86d26c373fe5.herokuapp.com',
+        'https://back-projet-web-s7-21ead7148147.herokuapp.com'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -44,7 +44,7 @@ const utilisateur_1 = __importDefault(require("./routes/utilisateur"));
 const gestion_1 = __importDefault(require("./routes/gestion"));
 // Route de test
 app.get('/', (req, res) => {
-    console.log('Root route hit');
+    console.log('✅ API Root - Server is running');
     res.status(200).send('API Root Route - Server is running');
 });
 // Associer les routes
@@ -62,27 +62,24 @@ app.use('/api/jeux', jeu_1.default);
 app.use('/api/utilisateurs', utilisateur_1.default);
 // Route 404
 app.use('*', (req, res) => {
-    console.log('404 - Route not found:', req.originalUrl);
+    console.log('⚠️ 404 - Route not found:', req.originalUrl);
     res.status(404).json({ error: 'Route not found' });
 });
-// Démarrage du serveur avec connexion à la base et exécution du seeder
-const PORT = Number(process.env.PORT) || 8000;
-const startServer = async () => {
+// Synchronisation de la base de données
+async function setupDatabase() {
     try {
-        console.log('🔄 Connecting to database...');
-        await database_1.default.authenticate(); // Vérifie la connexion à la base
-        console.log('✅ Database connected.');
+        console.log('🔄 Syncing database...');
+        await database_1.default.sync();
+        console.log('✅ Database sync complete.');
         console.log('🌱 Running database seeder...');
-        await (0, setupDatabase_1.default)(); // Exécute le seeder
+        await (0, setupDatabase_1.default)();
         console.log('✅ Database seeding completed.');
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
     }
     catch (error) {
-        console.error('❌ Failed to start server:', error);
-        process.exit(1); // Quitte l'application en cas d'erreur
+        console.error('❌ Error during database setup:', error);
+        process.exit(1);
     }
-};
-startServer();
+}
+// Lancer le setup de la base en arrière-plan (évite de bloquer l’exécution du serveur)
+setupDatabase();
 exports.default = app;
