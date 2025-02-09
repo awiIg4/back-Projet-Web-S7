@@ -15,7 +15,7 @@ jobs:
       - name: Deploy to Heroku
         uses: dentarg/heroku@v1
         with:
-          app: "nom-de-ton-app-heroku"  # Remplace par le nom de ton app Heroku
+          app: "back-projet-web-s7" 
           key: ${{ secrets.HEROKU_API_KEY }}
           sha: ${{ github.sha }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
