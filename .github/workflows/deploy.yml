@@ -1,0 +1,21 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main  # Déploie automatiquement les commits sur main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Heroku
+        uses: dentarg/heroku@v1
+        with:
+          app: "nom-de-ton-app-heroku"  # Remplace par le nom de ton app Heroku
+          key: ${{ secrets.HEROKU_API_KEY }}
+          sha: ${{ github.sha }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
