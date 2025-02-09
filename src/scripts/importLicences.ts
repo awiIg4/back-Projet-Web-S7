@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
-import Licence from '../src/models/licence';
-import Editeur from '../src/models/editeur';
+import Licence from '../models/licence';
+import Editeur from '../models/editeur';
 
 export async function importLicences() {
   const licencesFile = path.join(__dirname, '../data/licences.csv');

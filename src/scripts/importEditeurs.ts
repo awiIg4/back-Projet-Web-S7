@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
-import Editeur from '../src/models/editeur';
+import Editeur from '../models/editeur';
 
 export async function importEditeurs() {
   const editeursFile = path.join(__dirname, '../data/editeurs.csv');

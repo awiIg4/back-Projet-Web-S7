@@ -1,5 +1,5 @@
-import Administrateur from '../src/models/administrateur';
-import Utilisateur from '../src/models/utilisateur';
+import Administrateur from '../models/administrateur';
+import Utilisateur from '../models/utilisateur';
 import bcrypt from 'bcrypt';
 
 export async function createAdmin() {
