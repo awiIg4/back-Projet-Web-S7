@@ -3,18 +3,29 @@ name: Deploy to Heroku
 on:
   push:
     branches:
-      - main  # Déploie automatiquement les commits sur main
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
 
       - name: Deploy to Heroku
-        uses: dentarg/heroku@v1
+        uses: akhileshns/heroku-deploy@v3.12.14
         with:
-          app: "back-projet-web-s7" 
-          key: ${{ secrets.HEROKU_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "back-projet-web-s7"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          usedocker: true
