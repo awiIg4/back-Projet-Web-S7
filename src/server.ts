@@ -11,9 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:4200', // TODO: Utiliser une variable d'environnement pour l'URL
+    origin: ['http://localhost:4200', 'https://back-projet-web-s7.herokuapp.com', 'https://back-projet-web-s7-21ead7148147.herokuapp.com'],
     credentials: true, 
-  }));
+}));
 // Importer les routes
 import administrateurRoutes from './routes/administrateur';
 import gestionnaireRoutes from './routes/gestionnaire';
@@ -28,6 +28,14 @@ import jeuRoutes from './routes/jeu';
 import utilisateurRoutes from './routes/utilisateur';
 import gestionRoutes from './routes/gestion';
 
+// Mettre cette route AVANT les autres routes
+app.get('/test', (req, res) => {
+  res.send('API Test Route');
+});
+
+app.get('/', (req, res) => {
+  res.send('API Root Route');
+});
 
 // Associer les routes à des chemins spécifiques
 app.use('/api/administrateurs', administrateurRoutes);
@@ -42,9 +50,5 @@ app.use('/api/codesPromotion', codePromotionRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/jeux', jeuRoutes);
 app.use('/api/utilisateurs', utilisateurRoutes);
-
-app.get('/', (req, res) => {
-  res.json({ message: 'API is running' });
-});
 
 export default app;
