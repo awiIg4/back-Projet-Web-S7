@@ -50,11 +50,6 @@ app.get('/', (req, res) => {
   res.status(200).send('API Root Route - Server is running');
 });
 
-app.get('/test', (req, res) => {
-  console.log('Test route hit');
-  res.status(200).send('API Test Route');
-});
-
 // Associer les routes à des chemins spécifiques
 app.use('/api/administrateurs', administrateurRoutes);
 app.use('/api/gestionnaires', gestionnaireRoutes);
