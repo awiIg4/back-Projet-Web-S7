@@ -17,9 +17,17 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Configuration CORS mise à jour
 app.use(cors({
-    origin: '*', // Temporairement accepter toutes les origines
+    origin: [
+      'http://localhost:4200',  // Pour le développement local
+      'https://awi-86d26c373fe5.herokuapp.com', // Frontend sur Heroku
+      'https://back-projet-web-s7-21ead7148147.herokuapp.com' // Backend sur Heroku
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 // Importer les routes
