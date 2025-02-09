@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # Service de base de données commun à tous les profils
+  db:
+    profiles:
+      - dev
+      - test
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Service de l'application pour le développement
+  app_dev:
+    profiles:
+      - dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: development
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+      SERVER_PORT: 8000
+      ACCESS_TOKEN_SECRET: votre-clé-secrète
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+        - ./src:/app/src
+
+  # Service de l'application pour les tests
+  app_test:
+    profiles:
+      - test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      NODE_ENV: test
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: database
+      ACCESS_TOKEN_SECRET: votre-clé-secrète
+    depends_on:
+      - db
+
+
+  # Service de l'application pour la production
+  app_prod:
+    profiles:
+      - prod
+    image: back-projet-web-s7-app_prod:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "postgres://udl3ogjs2n78bk:p83419240df68aef4031551b8a839fd7cd79a7ccabedca3856482890544d6674f@cf9gid2f6uallg.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/ddnfreibk0vunq"
+    ports:
+      - "8000:8000"
+    command: node dist/index.js
+
+
+volumes:
+  db_data:

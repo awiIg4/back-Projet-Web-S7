@@ -1,22 +1,32 @@
-import { Model, Table, Column, DataType, HasMany } from 'sequelize-typescript';
-import Jeu from './jeu';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import Licence from './licence';
 
-@Table
-class Editeur extends Model {
+interface EditeurAttributes {
+  id: number;
+  nom: string;
+}
+
+interface EditeurCreationAttributes extends Omit<EditeurAttributes, 'id'> {}
+
+@Table({
+  tableName: 'editeurs',
+  timestamps: false,
+})
+export default class Editeur extends Model<EditeurAttributes, EditeurCreationAttributes> implements EditeurAttributes {
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  })
+  public id!: number;
+
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  nom!: string;
+  public nom!: string;
 
-  @Column(DataType.STRING)
-  adresse!: string;
-
-  @Column(DataType.STRING)
-  contact!: string;
-
-  @HasMany(() => Jeu)
-  jeux!: Jeu[];
+  @HasMany(() => Licence, { as: 'licences', foreignKey: 'editeur_id' })
+  public licences?: Licence[];
 }
-
-export default Editeur;

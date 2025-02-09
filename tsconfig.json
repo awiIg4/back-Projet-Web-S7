@@ -2,12 +2,18 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
     "strict": true,
     "esModuleInterop": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "typeRoots": ["node_modules/@types", "types"],
+    "moduleResolution": "node",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "types": ["jest", "node","supertest"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "types/**/*"],
+  "exclude": ["node_modules"]
 }

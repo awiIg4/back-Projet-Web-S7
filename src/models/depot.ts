@@ -1,44 +1,63 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany} from 'sequelize-typescript';
 import Vendeur from './vendeur';
 import Jeu from './jeu';
 import Session from './session';
 
-@Table
-class Depot extends Model {
-  @ForeignKey(() => Vendeur)
+interface DepotAttributes {
+  id: number;
+  vendeur_id: number;
+  session_id: number;
+  frais_depot: number;
+  date_depot: Date;
+}
+
+interface DepotCreationAttributes extends Omit<DepotAttributes, 'id'> {}
+
+@Table({
+  tableName: 'depots',
+  timestamps: false,
+})
+export default class Depot extends Model<DepotAttributes, DepotCreationAttributes> implements DepotAttributes {
   @Column({
-    type: DataType.INTEGER,  // Correction ici
+    type: DataType.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
     allowNull: false,
   })
-  vendeurId!: number;
+  public id!: number;
+
+  @ForeignKey(() => Vendeur)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  public vendeur_id!: number;
+
+  @BelongsTo(() => Vendeur, { as: 'vendeur' })
+  public vendeur?: Vendeur;
 
   @ForeignKey(() => Session)
   @Column({
-    type: DataType.INTEGER,  // Correction ici
+    type: DataType.INTEGER,
     allowNull: false,
   })
-  sessionId!: number;
+  public session_id!: number;
+
+  @BelongsTo(() => Session, { as: 'session' })
+  public session?: Session;
 
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.DECIMAL(10, 2),
     allowNull: false,
   })
-  fraisDepot!: number;
+  public frais_depot!: number;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  dateDepot!: Date;
+  public date_depot!: Date;
 
-  @BelongsTo(() => Vendeur)
-  vendeur!: Vendeur;
-
-  @BelongsTo(() => Session)
-  session!: Session;
-
-  @HasMany(() => Jeu)
-  jeux!: Jeu[];
+  @HasMany(() => Jeu, { as: 'jeux', foreignKey: 'depot_id' })
+  public jeux?: Jeu[];
 }
-
-export default Depot;

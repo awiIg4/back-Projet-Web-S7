@@ -1,68 +1,71 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import Jeu from './jeu';
-import Vendeur from './vendeur';
 import Acheteur from './acheteur';
 import CodePromotion from './codePromotion';
 
-@Table
-class Achat extends Model {
+export interface AchatAttributes {
+  id: number;
+  jeu_id: number;
+  acheteur_id: number;
+  date_transaction: Date;
+  commission: number;
+  codePromotionLibele?: string;
+}
+
+export interface AchatCreationAttributes extends Omit<AchatAttributes, 'id'> {}
+
+@Table({
+  tableName: 'achats',
+  timestamps: false,
+})
+export default class Achat extends Model<AchatAttributes, AchatCreationAttributes> implements AchatAttributes {
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  })
+  public id!: number;
+
   @ForeignKey(() => Jeu)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  jeuId!: number;
+  public jeu_id!: number;
 
-  @ForeignKey(() => Vendeur)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  vendeurId!: number;
+  @BelongsTo(() => Jeu)
+  public jeu?: Jeu;
 
   @ForeignKey(() => Acheteur)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
-  acheteurId!: number;
+  public acheteur_id!: number;
 
-  @ForeignKey(() => CodePromotion)
-  @Column({
-    type: DataType.STRING,  // Correction ici
-    allowNull: false,
-  })
-  codepromotion!: string;
+  @BelongsTo(() => Acheteur)
+  public acheteur?: Acheteur;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  dateTransaction!: Date;
+  public date_transaction!: Date;
 
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.DECIMAL,
     allowNull: false,
   })
-  montant!: number;
+  public commission!: number;
 
+  @ForeignKey(() => CodePromotion)
   @Column({
-    type: DataType.FLOAT,
-    allowNull: false,
+    type: DataType.STRING,
+    allowNull: true,
   })
-  commission!: number;
-
-  @BelongsTo(() => Jeu)
-  jeu!: Jeu;
-
-  @BelongsTo(() => Vendeur)
-  vendeur!: Vendeur;
-
-  @BelongsTo(() => Acheteur)
-  acheteur!: Acheteur;
+  public codePromotionLibele?: string;
 
   @BelongsTo(() => CodePromotion)
-  codePromotion!: CodePromotion;
+  public codePromotion?: CodePromotion;
 }
-
-export default Achat;

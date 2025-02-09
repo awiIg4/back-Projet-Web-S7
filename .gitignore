@@ -1,4 +1,5 @@
-/node_modules            # Exclut le dossier des dépendances Node.js
-/dist                    # Exclut le dossier des fichiers compilés
+node_modules/            # Exclut le dossier des dépendances Node.js
+dist/                    # Exclut le dossier des fichiers compilés
 .env                     # Exclut les fichiers de variables d'environnement contenant des infos sensibles
 /package-lock.json        # Exclut le fichier lock si tu préfères ne pas le versionner
+node_modules

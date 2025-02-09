@@ -1,24 +1,27 @@
-import { Model, Table, Column, DataType, HasMany } from 'sequelize-typescript';
-import Achat from './achat';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
-class CodePromotion extends Model {
+export interface CodePromotionAttributes {
+  libelle: string;
+  reductionPourcent: number;
+}
+
+export interface CodePromotionCreationAttributes extends CodePromotionAttributes {}
+
+@Table({
+  tableName: 'code_promotion',
+  timestamps: false,
+})
+export default class CodePromotion extends Model<CodePromotionAttributes, CodePromotionCreationAttributes> implements CodePromotionAttributes {
   @Column({
     type: DataType.STRING,
     primaryKey: true,
     allowNull: false,
-    unique: true,
   })
-  libele!: string;
+  public libelle!: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  reductionPourcent!: number;
-
-  @HasMany(() => Achat)
-  achats!: Achat[];
+  public reductionPourcent!: number;
 }
-
-export default CodePromotion;

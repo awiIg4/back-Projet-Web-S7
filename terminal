@@ -1,0 +1,2 @@
+npm install --save sequelize sequelize-typescript reflect-metadata
+
