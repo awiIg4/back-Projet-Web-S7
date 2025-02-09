@@ -1,9 +1,9 @@
 import express from 'express';
 import { config } from 'dotenv';
-import { connectDB } from './models';
+import sequelize from './config/database';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-
+import runSeeder from './scripts/setupDatabase'; // Import du seeder
 
 config(); // Charger les variables d'environnement
 
@@ -44,13 +44,13 @@ import jeuRoutes from './routes/jeu';
 import utilisateurRoutes from './routes/utilisateur';
 import gestionRoutes from './routes/gestion';
 
-// Route de test tout en haut
+// Route de test
 app.get('/', (req, res) => {
   console.log('Root route hit');
   res.status(200).send('API Root Route - Server is running');
 });
 
-// Associer les routes à des chemins spécifiques
+// Associer les routes
 app.use('/api/administrateurs', administrateurRoutes);
 app.use('/api/gestionnaires', gestionnaireRoutes);
 app.use('/api/gestion', gestionRoutes);
@@ -64,10 +64,35 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/jeux', jeuRoutes);
 app.use('/api/utilisateurs', utilisateurRoutes);
 
-// Route 404 pour les chemins non trouvés
+// Route 404
 app.use('*', (req, res) => {
   console.log('404 - Route not found:', req.originalUrl);
   res.status(404).json({ error: 'Route not found' });
 });
+
+// Démarrage du serveur avec connexion à la base et exécution du seeder
+const PORT = Number(process.env.PORT) || 8000;
+
+const startServer = async () => {
+  try {
+    console.log('🔄 Connecting to database...');
+    await sequelize.authenticate(); // Vérifie la connexion à la base
+    console.log('✅ Database connected.');
+
+    console.log('🌱 Running database seeder...');
+    await runSeeder(); // Exécute le seeder
+    console.log('✅ Database seeding completed.');
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1); // Quitte l'application en cas d'erreur
+  }
+};
+
+startServer();
 
 export default app;
