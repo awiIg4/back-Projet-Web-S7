@@ -4,7 +4,7 @@ import csvParser from 'csv-parser';
 import Editeur from '../models/editeur';
 
 export async function importEditeurs() {
-  const editeursFile = path.join(__dirname, '../data/editeurs.csv');
+  const editeursFile = path.join(__dirname, '../../data/editeurs.csv');
 
   if (!fs.existsSync(editeursFile)) {
     console.log(`📂 Chemin du fichier attendu : ${editeursFile}`);

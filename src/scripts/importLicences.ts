@@ -5,7 +5,7 @@ import Licence from '../models/licence';
 import Editeur from '../models/editeur';
 
 export async function importLicences() {
-  const licencesFile = path.join(__dirname, '../data/licences.csv');
+  const licencesFile = path.join(__dirname, '../../data/licences.csv');
 
   if (!fs.existsSync(licencesFile)) {
     console.error('❌ Fichier licences.csv introuvable !');
