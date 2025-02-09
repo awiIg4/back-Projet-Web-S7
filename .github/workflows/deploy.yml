@@ -22,6 +22,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku --version
+
       - name: Login to Heroku
         uses: AkhileshNS/heroku-deploy@v3.12.14
         with:
