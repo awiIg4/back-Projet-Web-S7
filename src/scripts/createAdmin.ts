@@ -21,9 +21,12 @@ export async function createAdmin() {
 
   if (!admin) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await Administrateur.create({
-      id: utilisateur.id,
-      mot_de_passe: hashedPassword
+    utilisateur = await Utilisateur.create({
+      email,
+      nom: 'Admin',
+      telephone: '0000000000',
+      adresse: 'Adresse Admin',
+      type_utilisateur: 'administrateur',
     });
 
     console.log('✅ Admin created successfully!');
