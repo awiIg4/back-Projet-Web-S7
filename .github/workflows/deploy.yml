@@ -22,17 +22,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Login to Heroku Container Registry
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-          heroku container:login
-
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.14
+      - name: Login to Heroku
+        uses: AkhileshNS/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "back-projet-web-s7"
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          usedocker: true
+          justlogin: true
+
+      - name: Build and push Docker image
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku container:push web -a back-projet-web-s7
+          heroku container:release web -a back-projet-web-s7
