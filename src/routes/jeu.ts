@@ -151,6 +151,7 @@ router.get('/rechercher',
   }
 );
 
+
 // Route pour trouver les jeux à mettre en rayon
 router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -633,5 +634,51 @@ router.post('/acheter', authenticateToken, isAdminOrManager,
     }
   }
 );
+
+// Route pour trouver les informations d'un jeu par son id
+router.get('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const jeu = await Jeu.findByPk(req.params.id, {
+      include: [
+        {
+          model: Licence,
+          as: 'licence',
+          attributes: ['nom'],
+          include: [
+            {
+              model: Editeur,
+              as: 'editeur',
+            },
+          ],
+        },
+        {
+          model: Depot,
+          as: 'depot',
+          include: [
+            {
+              model: Vendeur,
+              as: 'vendeur',
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!jeu) {
+      res.status(404).send('Jeu introuvable.');
+      return;
+    }
+
+    const jeuData = {
+      ...jeu.toJSON(),
+      licence_name: jeu.licence?.nom,
+    };
+
+    res.status(200).json(jeuData);
+  } catch (error) {
+    console.error('Erreur lors de la recherche du jeu:', error);
+    res.status(500).send('Erreur lors de la recherche du jeu.');
+  }
+});
 
 export default router;
