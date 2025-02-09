@@ -8,12 +8,20 @@ import cors from 'cors';
 config(); // Charger les variables d'environnement
 
 const app = express();
+
+// Middleware de logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://localhost:4200', 'https://back-projet-web-s7.herokuapp.com', 'https://back-projet-web-s7-21ead7148147.herokuapp.com'],
-    credentials: true, 
+    origin: '*', // Temporairement accepter toutes les origines
+    credentials: true,
 }));
+
 // Importer les routes
 import administrateurRoutes from './routes/administrateur';
 import gestionnaireRoutes from './routes/gestionnaire';
@@ -28,13 +36,15 @@ import jeuRoutes from './routes/jeu';
 import utilisateurRoutes from './routes/utilisateur';
 import gestionRoutes from './routes/gestion';
 
-// Mettre cette route AVANT les autres routes
-app.get('/test', (req, res) => {
-  res.send('API Test Route');
+// Route de test tout en haut
+app.get('/', (req, res) => {
+  console.log('Root route hit');
+  res.status(200).send('API Root Route - Server is running');
 });
 
-app.get('/', (req, res) => {
-  res.send('API Root Route');
+app.get('/test', (req, res) => {
+  console.log('Test route hit');
+  res.status(200).send('API Test Route');
 });
 
 // Associer les routes à des chemins spécifiques
@@ -50,5 +60,11 @@ app.use('/api/codesPromotion', codePromotionRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/jeux', jeuRoutes);
 app.use('/api/utilisateurs', utilisateurRoutes);
+
+// Route 404 pour les chemins non trouvés
+app.use('*', (req, res) => {
+  console.log('404 - Route not found:', req.originalUrl);
+  res.status(404).json({ error: 'Route not found' });
+});
 
 export default app;
