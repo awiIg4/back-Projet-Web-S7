@@ -22,6 +22,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Login to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku container:login
+
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
