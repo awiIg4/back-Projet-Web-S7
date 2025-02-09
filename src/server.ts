@@ -43,4 +43,8 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/jeux', jeuRoutes);
 app.use('/api/utilisateurs', utilisateurRoutes);
 
+app.get('/', (req, res) => {
+  res.json({ message: 'API is running' });
+});
+
 export default app;

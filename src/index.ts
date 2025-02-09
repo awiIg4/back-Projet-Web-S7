@@ -1,12 +1,13 @@
 import app from './server';
-import { connectDB } from './models';
+import sequelize from './config/database';
 
-connectDB().then(() => {
-  // Démarrer le serveur après la connexion à la base de données
-  const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
+
+sequelize.sync().then(() => {
+  console.log('Database connected...');
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-}).catch((err) => {
+}).catch(err => {
   console.error('Failed to connect to the database:', err);
 });
