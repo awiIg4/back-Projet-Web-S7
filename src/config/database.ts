@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
-import { config } from 'dotenv';
-config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 import Utilisateur from '../models/utilisateur';
 import Vendeur from '../models/vendeur';
@@ -37,7 +37,7 @@ const useDatabaseURL = !!process.env.DATABASE_URL;
 
 let sequelize: Sequelize;
 
-const config = {
+const dbConfig = {
   production: {
     url: process.env.DATABASE_URL,
     dialect: 'postgres',
