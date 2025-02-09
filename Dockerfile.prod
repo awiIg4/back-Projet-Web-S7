@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Installer les dépendances de production
-RUN npm install --only=production
+RUN npm install
 
 # Copier le reste du code source
 COPY . .
@@ -24,11 +24,16 @@ FROM node:18-alpine
 # Définir le répertoire de travail
 WORKDIR /app
 
+COPY package*.json ./
+
+RUN npm install --omit=dev --omit=test
+
 # Copier les fichiers nécessaires depuis l'étape de build
-COPY --from=builder /app /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/config/config.js ./config/config.js
 
 # Exposer le port de l'application
 EXPOSE 8000
 
 # Commande de démarrage en production
-CMD ["node", "dist/index.js"]
+CMD ["npm", "run", "prod"]

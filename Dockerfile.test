@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8000
 
 # Commande pour exécuter les tests
-CMD ["npm", "test"]
+CMD ["npm", "run", "test:internal"]
