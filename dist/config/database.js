@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-config();
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const utilisateur_1 = __importDefault(require("../models/utilisateur"));
 const vendeur_1 = __importDefault(require("../models/vendeur"));
 const acheteur_1 = __importDefault(require("../models/acheteur"));
@@ -36,7 +37,7 @@ const models = [
 // 2) Sinon, on prend les variables DB_HOST/DB_USER/etc. pour le dev/test
 const useDatabaseURL = !!process.env.DATABASE_URL;
 let sequelize;
-const config = {
+const dbConfig = {
     production: {
         url: process.env.DATABASE_URL,
         dialect: 'postgres',

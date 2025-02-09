@@ -17,8 +17,7 @@
     "docker:prod": "docker-compose --profile prod build --no-cache && docker-compose --profile prod up",
     "start": "node dist/index.js",
     "postinstall": "tsc",
-    "heroku-postbuild": "npm run build",
-    "setup-db": "node dist/scripts/setupDatabase.js"
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -38,7 +37,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.0",
     "express-validator": "^7.2.0",
-    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "pg": "^8.13.1",

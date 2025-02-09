@@ -21,9 +21,9 @@ app.use(cookieParser());
 // Configuration CORS mise à jour
 app.use(cors({
     origin: [
-      'http://localhost:4200',  // Pour le développement local
-      'https://awi-86d26c373fe5.herokuapp.com', // Frontend sur Heroku
-      'https://back-projet-web-s7-21ead7148147.herokuapp.com' // Backend sur Heroku
+      'http://localhost:4200', 
+      'https://awi-86d26c373fe5.herokuapp.com',
+      'https://back-projet-web-s7-21ead7148147.herokuapp.com'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -89,7 +89,7 @@ const startServer = async () => {
 
   } catch (error) {
     console.error('❌ Failed to start server:', error);
-    process.exit(1); // Quitte l'application en cas d'erreur
+    process.exit(1);
   }
 };
 
