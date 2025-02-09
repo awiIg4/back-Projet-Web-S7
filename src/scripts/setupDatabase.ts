@@ -41,9 +41,6 @@ async function setupDatabase() {
   }
 
   console.log('\n✅ Database setup completed successfully!');
-
-  // Arrêter le processus proprement sur Heroku
-  process.exit(0);
 }
 
 setupDatabase();
