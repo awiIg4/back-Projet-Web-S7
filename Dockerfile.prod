@@ -5,27 +5,27 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copier d'abord les fichiers de dépendances
+# Copier les fichiers de configuration
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Installer toutes les dépendances
+# Installer toutes les dépendances (dev incluses)
 RUN npm ci
 
-# Copier le reste des sources
+# Copier les sources
 COPY src/ ./src/
 
 # Build
 RUN npm run build
 
-# Étape 2 : Production
+# Étape de production
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Copier les fichiers nécessaires
+# Copier package.json et installer les dépendances de production
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev --ignore-scripts
 
 # Copier les fichiers buildés
 COPY --from=builder /app/dist ./dist
