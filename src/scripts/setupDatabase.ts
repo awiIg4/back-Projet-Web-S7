@@ -26,3 +26,5 @@ async function setupDatabase() {
 }
 
 setupDatabase();
+
+export default setupDatabase;
