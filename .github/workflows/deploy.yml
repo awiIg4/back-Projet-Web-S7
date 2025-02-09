@@ -27,13 +27,11 @@ jobs:
           curl https://cli-assets.heroku.com/install.sh | sh
           heroku --version
 
-      - name: Login to Heroku
-        uses: AkhileshNS/heroku-deploy@v3.12.14
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "back-projet-web-s7"
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          justlogin: true
+      - name: Login to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
 
       - name: Build and push Docker image
         env:
