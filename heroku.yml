@@ -1,0 +1,10 @@
+setup:
+  addons:
+    - plan: heroku-postgresql:mini
+
+build:
+  docker:
+    web: Dockerfile.prod
+
+run:
+  web: npm run prod
