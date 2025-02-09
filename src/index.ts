@@ -1,7 +1,7 @@
 import app from './server';
 import sequelize from './config/database';
 
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT) || 8000;
 
 sequelize.sync().then(() => {
   console.log('Database connected...');
