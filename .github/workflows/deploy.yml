@@ -17,5 +17,4 @@ jobs:
         with:
           app: "back-projet-web-s7" 
           key: ${{ secrets.HEROKU_API_KEY }}
-          sha: ${{ github.sha }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
