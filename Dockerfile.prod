@@ -3,37 +3,38 @@
 # Étape 1 : Build
 FROM node:18-alpine AS builder
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers package.json et package-lock.json
-COPY package*.json ./
+# Copier les fichiers de configuration
+COPY package*.json tsconfig.json ./
 
-# Installer les dépendances de production
+# Installer toutes les dépendances (dev incluses)
 RUN npm install
 
-# Copier le reste du code source
+# Copier le code source
 COPY . .
 
-# Construire l'application si nécessaire (par exemple, pour TypeScript)
+# Build l'application
 RUN npm run build
 
-# Étape 2 : Exécuter
+# Étape 2 : Production
 FROM node:18-alpine
 
-# Définir le répertoire de travail
 WORKDIR /app
 
+# Copier package.json et installer uniquement les dépendances de production
 COPY package*.json ./
+RUN npm install --omit=dev
 
-RUN npm install --omit=dev --omit=test
-
-# Copier les fichiers nécessaires depuis l'étape de build
+# Copier les fichiers compilés depuis l'étape de build
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/config/config.js ./config/config.js
+COPY --from=builder /app/config ./config
 
-# Exposer le port de l'application
+# Variables d'environnement
+ENV NODE_ENV=production
+ENV PORT=8000
+
 EXPOSE 8000
 
-# Commande de démarrage en production
-CMD ["npm", "run", "prod"]
+# Démarrer l'application
+CMD ["npm", "start"]
