@@ -1,40 +1,37 @@
-import fs from 'fs';
-import path from 'path';
-import csvParser from 'csv-parser';
 import Editeur from '../models/editeur';
 
 export async function importEditeurs() {
-  const editeursFile = path.join(__dirname, '../../data/editeurs.csv');
+  console.log('📥 Importation des éditeurs depuis la liste statique...');
 
-  if (!fs.existsSync(editeursFile)) {
-    console.log(`📂 Chemin du fichier attendu : ${editeursFile}`);
-    console.error('❌ Fichier editeurs.csv introuvable !');
-    return;
+  // Liste étendue des éditeurs
+  const editeurs = [
+    { nom: 'Ubisoft' },
+    { nom: 'Electronic Arts' },
+    { nom: 'Nintendo' },
+    { nom: 'Sony Interactive Entertainment' },
+    { nom: 'Microsoft Studios' },
+    { nom: 'Rockstar Games' },
+    { nom: 'Bethesda Softworks' },
+    { nom: 'Square Enix' },
+    { nom: 'Capcom' },
+    { nom: 'Konami' },
+    { nom: 'Activision Blizzard' },
+    { nom: 'Bandai Namco' },
+    { nom: 'CD Projekt' },
+    { nom: 'SEGA' },
+    { nom: '2K Games' },
+    { nom: 'FromSoftware' },
+    { nom: 'Valve' },
+    { nom: 'Epic Games' }
+  ];
+
+  for (const editeurData of editeurs) {
+    const editeurFound = await Editeur.findOne({ where: { nom: editeurData.nom } });
+    if (!editeurFound) {
+      const editeurCreated = await Editeur.create(editeurData);
+      console.log(`✅ Editeur ajouté : ${editeurCreated.nom}`);
+    } else {
+      console.log(`⚠️ Editeur déjà existant : ${editeurFound.nom}`);
+    }
   }
-
-  console.log('📥 Importation des éditeurs...');
-
-  const editeurs: { nom: string }[] = [];
-
-  fs.createReadStream(editeursFile)
-    .pipe(csvParser())
-    .on('data', (row) => {
-      editeurs.push({ nom: row.nom });
-    })
-    .on('end', async () => {
-      for (const editeurData of editeurs) {
-        const [editeur, created] = await Editeur.findOrCreate({
-          where: { nom: editeurData.nom },
-          defaults: editeurData,
-        });
-
-        if (created) {
-          console.log(`✅ Editeur ajouté : ${editeur.nom}`);
-        } else {
-          console.log(`⚠️ Editeur déjà existant : ${editeur.nom}`);
-        }
-      }
-
-      console.log('🎉 Importation des éditeurs terminée.');
-    });
 }
