@@ -29,6 +29,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
+app.set('trust proxy', 1);
 
 // Importer les routes
 import administrateurRoutes from './routes/administrateur';
