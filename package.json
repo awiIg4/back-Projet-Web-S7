@@ -8,7 +8,7 @@
     "docker:dev": "docker-compose --profile dev build --no-cache && docker-compose --profile dev up",
     "test": "docker-compose --profile test up --build --exit-code-from app_test",
     "test:internal": "jest --passWithNoTests --detectOpenHandles main.test.ts",
-    "build": "tsc --project tsconfig.json && cpx 'data/**/*' dist/data",
+    "build": "tsc --project tsconfig.json && cp -r data dist/",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
     "migrate": "sequelize db:migrate",
