@@ -37,6 +37,4 @@ export async function importEditeurs() {
       console.log(`⚠️ Editeur déjà existant : ${editeur.nom}`);
     }
   }
-
-  console.log('🎉 Importation des éditeurs terminée.');
 }

@@ -60,6 +60,4 @@ export async function importLicences() {
       console.log(`⚠️ Licence déjà existante : ${licence.nom}`);
     }
   }
-
-  console.log('🎉 Importation des licences terminée.');
 }
