@@ -56,6 +56,8 @@ export async function importLicences() {
 
     if (created) {
       console.log(`✅ Licence ajoutée : ${licence.nom}`);
+    } else {
+      console.log(`⚠️ Licence déjà existante : ${licence.nom}`);
     }
   }
 }
