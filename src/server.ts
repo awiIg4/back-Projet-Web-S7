@@ -77,7 +77,6 @@ async function setupDatabase() {
     console.log('✅ Database sync complete.');
 
     console.log('🌱 Running database seeder...');
-    console.log('JAIME LE JAMBON BEAUCOUP BEAUCOUP BEAUCOUP CA FAIT CHIER DE FOUUUUUU');
     await runSeeder();
     console.log('✅ Database seeding completed.');
   } catch (error) {

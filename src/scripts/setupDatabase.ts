@@ -10,10 +10,6 @@ async function setupDatabase() {
   console.log('🚀 Starting database setup...');
 
   try {
-    console.log('🔄 Connecting to database... JADORE LES PATES AU PATES AUX PATES ');
-    await sequelize.authenticate();
-    console.log('✅ Database connected.');
-
     console.log('\n1. Creating admin user...');
     await createAdmin();
     console.log('✅ Admin setup completed.');
