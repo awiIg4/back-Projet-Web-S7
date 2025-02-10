@@ -33,8 +33,6 @@ export async function importEditeurs() {
 
     if (created) {
       console.log(`✅ Editeur ajouté : ${editeur.nom}`);
-    } else {
-      console.log(`⚠️ Editeur déjà existant : ${editeur.nom}`);
     }
   }
 }
