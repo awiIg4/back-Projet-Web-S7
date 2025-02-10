@@ -1,36 +1,30 @@
-# Dockerfile.prod
-
 # Étape 1 : Build
 FROM node:18-alpine AS builder
-
 WORKDIR /app
 
 # Installer les dépendances nécessaires pour bcrypt
 RUN apk add --no-cache python3 make g++
 
-# Copier tous les fichiers nécessaires pour le build
+# Copier les fichiers nécessaires pour le build
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-# Installer les dépendances et build
-RUN rm -rf dist/
-RUN npm ci && \
-    npm run build
+# Supprimer le dossier dist et lancer le build dans une seule commande
+RUN rm -rf dist && npm ci && npm run build
 
-# Étape de production
+# Étape 2 : Image de production
 FROM node:18-alpine
-
 WORKDIR /app
 
 # Installer les dépendances nécessaires pour bcrypt
 RUN apk add --no-cache python3 make g++
 
-# Copier package.json et installer les dépendances de production
+# Copier package*.json et installer les dépendances de production
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts
 
-# Copier les fichiers buildés
+# Copier le dossier buildé depuis le builder
 COPY --from=builder /app/dist ./dist
 
 # Variables d'environnement
@@ -40,6 +34,6 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Recompiler bcrypt pour la plateforme actuelle
-RUN cd /app && npm rebuild bcrypt --build-from-source
+RUN npm rebuild bcrypt --build-from-source
 
 CMD ["node", "dist/index.js"]
