@@ -45,7 +45,7 @@ export async function importLicences() {
     const editeur = await Editeur.findOne({ where: { nom: licenceData.editeur_nom } });
 
     if (!editeur) {
-      console.error(`❌ Editeur introuvable pour la licence ${licenceData.nom}`);
+      console.error(`❌ Editeur introuvable pour cette licence ${licenceData.nom}`);
       continue;
     }
 
