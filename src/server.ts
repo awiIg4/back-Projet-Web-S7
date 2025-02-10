@@ -73,7 +73,6 @@ app.use('*', (req, res) => {
 // Synchronisation de la base de données
 async function setupDatabase() {
   try {
-    console.log('🔄 Syncing database...');
     await sequelize.sync();
     console.log('✅ Database sync complete.');
 
