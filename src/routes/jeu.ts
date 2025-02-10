@@ -151,6 +151,37 @@ router.get('/rechercher',
   }
 );
 
+// Route pour les jeux à récupérer par un vendeur pour une session
+router.get('/a_recuperer', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const jeux = await Jeu.findAll({
+      where: {
+        statut: 'récuperable',
+      },
+      include: [
+        {
+          model: Depot,
+          as: 'depot',
+          include: [
+            {
+              model: Vendeur,
+              as: 'vendeur',
+            },
+            {
+              model: SessionModel,
+              as: 'session',
+            },
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(jeux);
+  } catch (error) {
+    console.error('Erreur lors de la recherche des jeux à récupérer:', error);
+    res.status(500).send('Erreur lors de la recherche des jeux à récupérer.');
+  }
+});
 
 // Route pour trouver les jeux à mettre en rayon
 router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -378,7 +409,7 @@ router.post('/recuperer', authenticateToken, isAdminOrManager,
       const jeux = await Jeu.findAll({
         where: {
           id: jeux_a_recup,
-          statut: ['en vente', 'récupérable'],
+          statut: ['en vente', 'récuperable'],
         },
       });
 

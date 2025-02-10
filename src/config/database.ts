@@ -37,7 +37,7 @@ const useDatabaseURL = !!process.env.DATABASE_URL;
 
 let sequelize: Sequelize;
 
-const config = {
+const dbConfig = {
   production: {
     url: process.env.DATABASE_URL,
     dialect: 'postgres',
