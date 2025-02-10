@@ -80,7 +80,7 @@ async function setupDatabase() {
     await runSeeder();
     console.log('✅ Database seeding completed.');
   } catch (error) {
-    console.error('❌ Error during database setup:', error);
+    console.error('❌ Error during database setup :', error);
     process.exit(1);
   }
 }
