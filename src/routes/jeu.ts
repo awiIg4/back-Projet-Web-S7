@@ -60,96 +60,116 @@ router.get('/rechercher',
   handleValidationErrors,
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const { numpage = '1', licence, editeur, price_min, price_max } = req.query;
-
-      // Convertir numpage en entier
-      const page = parseInt(numpage as string, 10) || 1;
-      const limit = 50; // Nombre de résultats par page
-      const offset = (page - 1) * limit;
-
-      // Construire la clause WHERE pour les jeux
-      const whereClause: any = {
-        statut: 'en vente', // On ne considère que les jeux en vente
-      };
-
-      // Filtre de prix
-      if (price_min || price_max) {
-        whereClause.prix = {};
-        if (price_min) {
-          whereClause.prix[Op.gte] = parseFloat(price_min as string);
-        }
-        if (price_max) {
-          whereClause.prix[Op.lte] = parseFloat(price_max as string);
-        }
-      }
-
-      // Construire les clauses d'inclusion pour les associations
-      const includeClause: any[] = [
-        {
-          model: Licence,
-          as: 'licence',
-          required: true,
-          include: [
-            {
-              model: Editeur,
-              as: 'editeur',
-              required: true,
-            },
-          ],
-        },
-      ];
-
-      // Filtre sur la licence
-      if (licence) {
-        const licenceName = removeAccents((licence as string).toLowerCase());
-        includeClause[0].where = Sequelize.where(
-          Sequelize.fn('lower', Sequelize.col('licence.nom')),
-          {
-            [Op.like]: `%${licenceName}%`,
-          }
-        );
-      }
-
-      // Filtre sur l'éditeur
-      if (editeur) {
-        const editeurName = removeAccents((editeur as string).toLowerCase());
-        includeClause[0].include[0].where = Sequelize.where(
-          Sequelize.fn('lower', Sequelize.col('licence->editeur.nom')),
-          {
-            [Op.like]: `%${editeurName}%`,
-          }
-        );
-      }
-
-      // Exécuter la requête
+      // Extraction et parsing des paramètres
+      const numpage = parseInt((req.query.numpage as string) || '1', 10);
+      const licence = req.query.licence ? removeAccents((req.query.licence as string).toLowerCase()) : null;
+      const editeur = req.query.editeur ? removeAccents((req.query.editeur as string).toLowerCase()) : null;
+      const price_min = req.query.price_min ? parseFloat(req.query.price_min as string) : null;
+      const price_max = req.query.price_max ? parseFloat(req.query.price_max as string) : null;
+  
+      const limit = 50;
+      const offset = (numpage - 1) * limit;
+  
+      // Récupérer **tous** les jeux en vente sans filtre SQL
       const jeux = await Jeu.findAll({
-        where: whereClause,
-        include: includeClause,
-        attributes: [
-          [fn('COUNT', col('Jeu.id')), 'quantite'],
-          [fn('MIN', col('Jeu.prix')), 'prix_min'],
-          [fn('MAX', col('Jeu.prix')), 'prix_max'],
-          [col('licence.nom'), 'licence_nom'],
-          [col('licence.editeur.nom'), 'editeur_nom'],
+        where: { statut: 'en vente' },
+        include: [
+          {
+            model: Licence,
+            as: 'licence',
+            include: [{ model: Editeur, as: 'editeur' }],
+          },
         ],
-        group: [
-          col('licence.id'),
-          col('licence.nom'),
-          col('licence.editeur.id'),
-          col('licence.editeur.nom'),
-        ],
-        limit,
-        offset,
-        subQuery: false, // Ajouté pour éviter les erreurs de sous-requêtes
       });
 
-      res.status(200).json(jeux);
+      console.log(jeux);
+  
+      // Appliquer les filtres **manuellement**
+      let filteredJeux = jeux;
+  
+      if (licence) {
+        filteredJeux = filteredJeux.filter(jeu =>
+          jeu.licence && removeAccents(jeu.licence.nom.toLowerCase()).includes(licence)
+        );
+      }
+  
+      if (editeur) {
+        filteredJeux = filteredJeux.filter(jeu =>
+          jeu.licence?.editeur && removeAccents(jeu.licence.editeur.nom.toLowerCase()).includes(editeur)
+        );
+      }
+  
+      if (price_min !== null) {
+        filteredJeux = filteredJeux.filter(jeu => parseFloat(jeu.prix.toString()) >= price_min);
+      }
+  
+      if (price_max !== null) {
+        filteredJeux = filteredJeux.filter(jeu => parseFloat(jeu.prix.toString()) <= price_max);
+      }
+  
+      // Regroupement par licence
+      const groupedJeux: any = {};
+      filteredJeux.forEach(jeu => {
+        const licenceId = jeu.licence?.id;
+        if (!licenceId) return;
+  
+        if (!groupedJeux[licenceId]) {
+          groupedJeux[licenceId] = {
+            quantite: 0,
+            prix_min: parseFloat(jeu.prix.toString()),
+            prix_max: parseFloat(jeu.prix.toString()),
+            licence_nom: jeu.licence?.nom,
+            editeur_nom: jeu.licence?.editeur?.nom || 'Éditeur inconnu',
+          };
+        }
+  
+        groupedJeux[licenceId].quantite++;
+        groupedJeux[licenceId].prix_min = Math.min(groupedJeux[licenceId].prix_min, parseFloat(jeu.prix.toString()));
+        groupedJeux[licenceId].prix_max = Math.max(groupedJeux[licenceId].prix_max, parseFloat(jeu.prix.toString()));
+      });
+  
+      // Conversion en tableau et pagination
+      const result = Object.values(groupedJeux).slice(offset, offset + limit);
+  
+      res.status(200).json(result);
     } catch (error) {
       console.error('Erreur lors de la recherche des jeux:', error);
       res.status(500).send('Erreur lors de la recherche des jeux.');
     }
   }
 );
+
+// Route pour les jeux à récupérer par un vendeur pour une session
+router.get('/a_recuperer', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const jeux = await Jeu.findAll({
+      where: {
+        statut: 'récuperable',
+      },
+      include: [
+        {
+          model: Depot,
+          as: 'depot',
+          include: [
+            {
+              model: Vendeur,
+              as: 'vendeur',
+            },
+            {
+              model: SessionModel,
+              as: 'session',
+            },
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(jeux);
+  } catch (error) {
+    console.error('Erreur lors de la recherche des jeux à récupérer:', error);
+    res.status(500).send('Erreur lors de la recherche des jeux à récupérer.');
+  }
+});
 
 // Route pour trouver les jeux à mettre en rayon
 router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -377,7 +397,7 @@ router.post('/recuperer', authenticateToken, isAdminOrManager,
       const jeux = await Jeu.findAll({
         where: {
           id: jeux_a_recup,
-          statut: ['en vente', 'récupérable'],
+          statut: ['en vente', 'récuperable'],
         },
       });
 
@@ -633,5 +653,51 @@ router.post('/acheter', authenticateToken, isAdminOrManager,
     }
   }
 );
+
+// Route pour trouver les informations d'un jeu par son id
+router.get('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const jeu = await Jeu.findByPk(req.params.id, {
+      include: [
+        {
+          model: Licence,
+          as: 'licence',
+          attributes: ['nom'],
+          include: [
+            {
+              model: Editeur,
+              as: 'editeur',
+            },
+          ],
+        },
+        {
+          model: Depot,
+          as: 'depot',
+          include: [
+            {
+              model: Vendeur,
+              as: 'vendeur',
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!jeu) {
+      res.status(404).send('Jeu introuvable.');
+      return;
+    }
+
+    const jeuData = {
+      ...jeu.toJSON(),
+      licence_name: jeu.licence?.nom,
+    };
+
+    res.status(200).json(jeuData);
+  } catch (error) {
+    console.error('Erreur lors de la recherche du jeu:', error);
+    res.status(500).send('Erreur lors de la recherche du jeu.');
+  }
+});
 
 export default router;
