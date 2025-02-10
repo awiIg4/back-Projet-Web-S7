@@ -144,13 +144,13 @@ router.post('/login', validateGestionnaireLogin, async (req: Request, res: Respo
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
       });
   
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/api/gestionnaires/refresh-token',
       });
   
@@ -187,7 +187,7 @@ router.post('/refresh-token', (req: Request, res: Response): void => {
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
       });
   
       res.status(200).send('Token d\'accès rafraîchi avec succès.');
