@@ -12,6 +12,7 @@ COPY src/ ./src/
 
 # Supprimer le dossier dist et lancer le build dans une seule commande
 RUN rm -rf dist && npm ci && npm run build
+RUN tree -L 2
 
 # Étape 2 : Image de production
 FROM node:18-alpine
