@@ -1,6 +1,6 @@
 import express, { Response, Request } from 'express';
 import { config } from 'dotenv';
-import { Op, fn, col } from 'sequelize';
+import { Op, fn, col, cast } from 'sequelize';
 import sequelize from '../config/database';
 import Utilisateur from '../models/utilisateur';
 import Vendeur, { VendeurCreationAttributes } from '../models/vendeur';
@@ -450,7 +450,7 @@ router.get(
         },
         attributes: [
           'licence_id',
-          [fn('COUNT', col('Jeu.id')), 'quantiteVendu'],
+          [cast(fn('COUNT', col('Jeu.id')), 'INTEGER'), 'quantiteVendu'],
         ],
         include: [
           {
