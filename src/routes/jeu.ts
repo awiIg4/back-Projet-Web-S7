@@ -568,8 +568,8 @@ router.post('/acheter', authenticateToken, isAdminOrManager,
           };
         }
 
-        sommeParVendeur[vendeurId].sommedue += montantDuVendeur;
-        sommeParVendeur[vendeurId].sommegenerée += prixApresReduction;
+        sommeParVendeur[vendeurId].sommedue = Number(sommeParVendeur[vendeurId].sommedue) + Number(montantDuVendeur);
+        sommeParVendeur[vendeurId].sommegenerée = Number(sommeParVendeur[vendeurId].sommegenerée) + Number(prixApresReduction);
 
         console.log(`Sommes accumulées pour le vendeur ${vendeurId} :`, sommeParVendeur[vendeurId]);
 
@@ -611,8 +611,8 @@ router.post('/acheter', authenticateToken, isAdminOrManager,
           console.log(`Nouvelle somme créée pour le vendeur ${vendeurId} :`, somme.toJSON());
         } else {
           // Convertir les valeurs en nombres avant l'addition
-          somme.sommedue = parseFloat(somme.sommedue.toString()) + sommedue;
-          somme.sommegenerée = parseFloat(somme.sommegenerée.toString()) + sommegenerée;
+          somme.sommedue = Number(somme.sommedue) + Number(sommedue);
+          somme.sommegenerée = Number(somme.sommegenerée) + Number(sommegenerée);
           await somme.save();
           console.log(`Somme mise à jour pour le vendeur ${vendeurId} :`, somme.toJSON());
         }
