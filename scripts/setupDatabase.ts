@@ -10,7 +10,7 @@ async function setupDatabase() {
   console.log('🚀 Starting database setup...');
 
   try {
-    console.log('🔄 Connecting to database...');
+    console.log('🔄 Connecting to database... JADORE LES PATES AU PATES AUX PATES ');
     await sequelize.authenticate();
     console.log('✅ Database connected.');
 
