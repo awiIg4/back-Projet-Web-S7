@@ -37,6 +37,6 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          docker build -t registry.heroku.com/back-projet-web-s7/web -f Dockerfile.prod .
+          docker build --no-cache -t registry.heroku.com/back-projet-web-s7/web -f Dockerfile.prod .
           docker push registry.heroku.com/back-projet-web-s7/web
           heroku container:release web -a back-projet-web-s7
