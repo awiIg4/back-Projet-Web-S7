@@ -1,5 +1,5 @@
 # Étape 1 : Build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Installer les dépendances nécessaires pour bcrypt
@@ -15,7 +15,7 @@ RUN rm -rf dist && npm ci && npm run build
 RUN tree -L 2
 
 # Étape 2 : Image de production
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 
 # Installer les dépendances nécessaires pour bcrypt
