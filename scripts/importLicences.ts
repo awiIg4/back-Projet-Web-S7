@@ -42,22 +42,27 @@ export async function importLicences() {
   ];
 
   for (const licenceData of licences) {
+    // Chercher l'éditeur associé
     const editeur = await Editeur.findOne({ where: { nom: licenceData.editeur_nom } });
-
     if (!editeur) {
-      console.error(`❌ Editeur introuvable pour cette licence ${licenceData.nom}`);
+      console.error(`❌ Editeur introuvable pour la licence ${licenceData.nom}`);
       continue;
     }
-
-    const [licence, created] = await Licence.findOrCreate({
-      where: { nom: licenceData.nom, editeur_id: editeur.id },
-      defaults: { nom: licenceData.nom, editeur_id: editeur.id },
+  
+    // Vérifier si la licence existe déjà pour cet éditeur
+    const licenceFound = await Licence.findOne({
+      where: { nom: licenceData.nom, editeur_id: editeur.id }
     });
-
-    if (created) {
-      console.log(`✅ Licence ajoutée : ${licence.nom}`);
+  
+    if (!licenceFound) {
+      // Créer la licence si elle n'existe pas
+      const licenceCreated = await Licence.create({
+        nom: licenceData.nom,
+        editeur_id: editeur.id
+      });
+      console.log(`✅ Licence ajoutée : ${licenceCreated.nom}`);
     } else {
-      console.log(`⚠️ Licence déjà existante : ${licence.nom}`);
+      console.log(`⚠️ Licence déjà existante : ${licenceFound.nom}`);
     }
   }
 }

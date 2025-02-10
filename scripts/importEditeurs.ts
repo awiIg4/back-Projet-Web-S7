@@ -26,15 +26,12 @@ export async function importEditeurs() {
   ];
 
   for (const editeurData of editeurs) {
-    const [editeur, created] = await Editeur.findOrCreate({
-      where: { nom: editeurData.nom },
-      defaults: editeurData,
-    });
-
-    if (created) {
-      console.log(`✅ Editeur ajouté : ${editeur.nom}`);
+    const editeurFound = await Editeur.findOne({ where: { nom: editeurData.nom } });
+    if (!editeurFound) {
+      const editeurCreated = await Editeur.create(editeurData);
+      console.log(`✅ Editeur ajouté : ${editeurCreated.nom}`);
     } else {
-      console.log(`⚠️ Editeur déjà existant : ${editeur.nom}`);
+      console.log(`⚠️ Editeur déjà existant : ${editeurFound.nom}`);
     }
   }
 }
