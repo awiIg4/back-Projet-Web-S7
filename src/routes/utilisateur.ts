@@ -1,12 +1,11 @@
 import express, { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/authenticateToken';
 import { authenticateToken } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
 import Utilisateur from '../models/utilisateur';
 
 const router = express.Router();
 
-router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const utilisateurs = await Utilisateur.findAll();
     res.status(200).json(utilisateurs);
@@ -16,7 +15,7 @@ router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRe
   }
 });
 
-router.put('/:id', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { nom, telephone, adresse } = req.body;
 
@@ -40,7 +39,7 @@ router.put('/:id', authenticateToken, isAdministrateur, async (req: Authenticate
   }
 });
 
-router.delete('/:id', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
 
   try {

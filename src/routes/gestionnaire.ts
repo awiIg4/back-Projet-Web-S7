@@ -7,7 +7,6 @@ import { body, validationResult } from 'express-validator';
 import Utilisateur from '../models/utilisateur';
 import Administrateur from '../models/administrateur';
 import { authenticateToken } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
 
 config(); // Charger les variables d'environnement
 
@@ -51,7 +50,7 @@ const validateGestionnaireLogin = [
 ];
 
 // Route d'inscription pour les gestionnaires avec validation
-router.post('/register', authenticateToken, isAdministrateur, validateGestionnaireRegister, async (req: Request, res: Response): Promise<void> => {
+router.post('/register', authenticateToken, validateGestionnaireRegister, async (req: Request, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });

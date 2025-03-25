@@ -6,7 +6,6 @@ import Licence from '../models/licence';
 import Editeur from '../models/editeur';
 import SessionModel from '../models/session'; // Renommé pour éviter les conflits
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager } from '../middleware/authorization';
 import { query, validationResult } from 'express-validator';
 
 const router = express.Router();
@@ -26,7 +25,7 @@ const validateJeu = [
 ];
 
 // Route pour récupérer les stats sur les jeux
-router.get('/jeux', authenticateToken, isAdminOrManager, validateJeu, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/jeux', authenticateToken, validateJeu, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });
@@ -118,7 +117,7 @@ const validateTaxes = [
 ];
 
 // Route pour récuperer les stats sur les taxes
-router.get('/taxes', authenticateToken, isAdminOrManager, validateTaxes, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/taxes', authenticateToken, validateTaxes, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });

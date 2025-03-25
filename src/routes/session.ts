@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 import { Op } from 'sequelize';
 import Session from '../models/session'; // Assurez-vous que ce chemin est correct
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
 import { body, param, validationResult } from 'express-validator';
 
 config(); // Charger les variables d'environnement
@@ -85,8 +84,7 @@ const validateSessionId = [
 // Route pour créer une nouvelle session
 router.post(
   '/',
-  authenticateToken,
-  isAdministrateur,
+  authenticateToken,,
   validateCreateSession,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
@@ -125,8 +123,7 @@ router.post(
 // Route pour récupérer toutes les sessions
 router.get(
   '/',
-  authenticateToken,
-  isAdministrateur,
+  authenticateToken,,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const sessions = await Session.findAll();
@@ -139,7 +136,7 @@ router.get(
 );
 
 // Route pour récupérer la session courante
-router.get('/current', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/current', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const today = new Date();
     const session = await Session.findOne({
@@ -163,7 +160,7 @@ router.get('/current', authenticateToken, isAdministrateur, async (req: Authenti
 );
 
 // Route pour récupérer une session par son ID
-router.get('/:id', authenticateToken, isAdministrateur, validateSessionId, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:id', authenticateToken, validateSessionId, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -188,7 +185,7 @@ router.get('/:id', authenticateToken, isAdministrateur, validateSessionId, async
 );
 
 // Route pour mettre à jour une session
-router.put('/:id', authenticateToken, isAdministrateur, validateUpdateSession, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.put('/:id', authenticateToken, validateUpdateSession, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -232,7 +229,7 @@ router.put('/:id', authenticateToken, isAdministrateur, validateUpdateSession, a
 );
 
 // Route pour supprimer une session
-router.delete('/:id', authenticateToken, isAdministrateur, validateSessionId, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete('/:id', authenticateToken, validateSessionId, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });

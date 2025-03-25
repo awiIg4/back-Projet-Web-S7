@@ -5,7 +5,6 @@ import { body, param, validationResult } from 'express-validator';
 import Licence from '../models/licence';
 import Editeur from '../models/editeur';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdministrateur, isAdminOrManager } from '../middleware/authorization';
 
 config(); // Charger les variables d'environnement
 
@@ -43,7 +42,7 @@ const validateLicenceParams = [
 ];
 
 // Route pour créer une nouvelle licence (Administrateur uniquement)
-router.post('/', authenticateToken, isAdministrateur, validateLicence, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/', authenticateToken, validateLicence, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -76,7 +75,7 @@ router.post('/', authenticateToken, isAdministrateur, validateLicence, async (re
 );
 
 // Route pour récupérer toutes les licences (Administrateur uniquement)
-router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const licences = await Licence.findAll({ include: [{ model: Editeur, as: 'editeur' }] });
       res.status(200).json(licences);
@@ -88,7 +87,7 @@ router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRe
 );
 
 // Route pour récupérer une licence par son ID (Administrateur uniquement)
-router.get('/:id', authenticateToken, isAdminOrManager, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:id', authenticateToken, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -114,7 +113,7 @@ router.get('/:id', authenticateToken, isAdminOrManager, validateLicenceParams, a
 );
 
 // Route pour récupérer une licence par son nom (Administrateur uniquement)
-router.get('/by-name/:nom', authenticateToken, isAdministrateur, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/by-name/:nom', authenticateToken, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -170,7 +169,7 @@ router.get('/search/:query', validateLicenceParams, async (req: Request, res: Re
 );
 
 // Route pour mettre à jour une licence (Administrateur uniquement)
-router.put('/:id', authenticateToken, isAdministrateur,
+router.put('/:id', authenticateToken,
   [
     ...validateLicenceParams,
     body('nom')
@@ -231,7 +230,7 @@ router.put('/:id', authenticateToken, isAdministrateur,
 );
 
 // Route pour supprimer une licence (Administrateur uniquement)
-router.delete('/:id', authenticateToken, isAdministrateur, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete('/:id', authenticateToken, validateLicenceParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -11,7 +11,6 @@ import Licence from '../models/licence';
 import Session from '../models/session';
 import { body, param, query, validationResult } from 'express-validator'; // Import ajouté
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager } from '../middleware/authorization';
 
 config(); // Charger les variables d'environnement
 
@@ -60,7 +59,7 @@ const validateStatsParam = [
 ];
 
 // Route pour créer un vendeur avec un email unique
-router.post('/register', authenticateToken, isAdminOrManager, validateVendeurRegister, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/register', authenticateToken, validateVendeurRegister, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -100,7 +99,7 @@ router.post('/register', authenticateToken, isAdminOrManager, validateVendeurReg
 );
 
 // Route pour charger un vendeur grâce à son email 
-router.get('/:email', authenticateToken, isAdminOrManager, validateEmailParam, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:email', authenticateToken, validateEmailParam, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -128,7 +127,7 @@ router.get('/:email', authenticateToken, isAdminOrManager, validateEmailParam, a
 );
 
 // Route pour récupérer les informations d'un vendeur 
-router.get('/informations/:id', authenticateToken, isAdminOrManager, [ param('id').isInt({ gt: 0 }).withMessage('id doit être un entier positif'), ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/informations/:id', authenticateToken, [ param('id').isInt({ gt: 0 }).withMessage('id doit être un entier positif'), ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -156,7 +155,7 @@ router.get('/informations/:id', authenticateToken, isAdminOrManager, [ param('id
 );
 
 // Route pour récupérer les jeux pour une session et un vendeur
-router.get('/stock/:idsession/:idvendeur', authenticateToken, isAdminOrManager, validateIdSessionVendeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/stock/:idsession/:idvendeur', authenticateToken, validateIdSessionVendeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -219,8 +218,7 @@ router.get('/stock/:idsession/:idvendeur', authenticateToken, isAdminOrManager, 
 
 // Route pour récupérer les jeux pour une session, un vendeur et un statut donné
 router.get('/stock/:idsession/:idvendeur/:statut',
-  authenticateToken,
-  isAdminOrManager,
+  authenticateToken,,
   [
     param('idsession').isInt({ gt: 0 }).withMessage('idsession doit être un entier positif'),
     param('idvendeur').isInt({ gt: 0 }).withMessage('idvendeur doit être un entier positif'),
@@ -298,7 +296,7 @@ router.get('/stock/:idsession/:idvendeur/:statut',
 
 
 // Route pour récupérer la somme due au vendeur pour une session
-router.get('/sommedue/:idsession/:idvendeur', authenticateToken, isAdminOrManager,
+router.get('/sommedue/:idsession/:idvendeur', authenticateToken,
   [
     param('idsession').isInt({ gt: 0 }).withMessage('idsession doit être un entier positif'),
     param('idvendeur').isInt({ gt: 0 }).withMessage('idvendeur doit être un entier positif'),
@@ -336,7 +334,7 @@ router.get('/sommedue/:idsession/:idvendeur', authenticateToken, isAdminOrManage
 );
 
 // Route pour mettre à jour la somme due à zéro pour une session et un vendeur
-router.put('/sommedue/:idsession/:idvendeur', authenticateToken, isAdminOrManager,
+router.put('/sommedue/:idsession/:idvendeur', authenticateToken,
   [
     param('idsession').isInt({ gt: 0 }).withMessage('idsession doit être un entier positif'),
     param('idvendeur').isInt({ gt: 0 }).withMessage('idvendeur doit être un entier positif'),
@@ -379,7 +377,7 @@ router.put('/sommedue/:idsession/:idvendeur', authenticateToken, isAdminOrManage
 
 
 // Route pour récupérer l'argent généré par les ventes pour une session avec validation
-router.get('/argentgagne/:idsession/:idvendeur', authenticateToken, isAdminOrManager,
+router.get('/argentgagne/:idsession/:idvendeur', authenticateToken,
   [
     param('idsession').isInt({ gt: 0 }).withMessage('idsession doit être un entier positif'),
     param('idvendeur').isInt({ gt: 0 }).withMessage('idvendeur doit être un entier positif'),
@@ -424,8 +422,7 @@ const validateStatsParams = [
 
 router.get(
   '/stats/:idvendeur',
-  authenticateToken,
-  isAdminOrManager,
+  authenticateToken,,
   validateStatsParams,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);

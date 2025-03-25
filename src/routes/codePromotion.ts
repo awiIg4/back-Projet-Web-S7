@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 import { Op } from 'sequelize';
 import CodePromo from '../models/codePromotion';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager, isAdministrateur } from '../middleware/authorization';
 import { body, param, validationResult } from 'express-validator';
 
 config(); // Charger les variables d'environnement
@@ -36,7 +35,7 @@ const validateSearchQuery = [
 ];
 
 // Route pour récupérer tous les codes promo (administrateur et gestionnaire uniquement)
-router.get('/', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const codesPromo = await CodePromo.findAll();
       res.status(200).json(codesPromo);
@@ -48,7 +47,7 @@ router.get('/', authenticateToken, isAdminOrManager, async (req: AuthenticatedRe
 );
 
 // Route pour récupérer la réduction associée à un code promo (administrateur et gestionnaire uniquement)
-router.get('/:codepromo', authenticateToken, isAdminOrManager,
+router.get('/:codepromo', authenticateToken,
   [
     param('codepromo')
       .isString()
@@ -80,7 +79,7 @@ router.get('/:codepromo', authenticateToken, isAdminOrManager,
 );
 
 // Route pour créer un nouveau code promo (administrateur uniquement)
-router.post('/', authenticateToken, isAdministrateur, validateCodePromo, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/', authenticateToken, validateCodePromo, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -106,7 +105,7 @@ router.post('/', authenticateToken, isAdministrateur, validateCodePromo, async (
 );
 
 // Route pour mettre à jour un code promo (administrateur uniquement)
-router.put('/:libelle', authenticateToken, isAdministrateur,
+router.put('/:libelle', authenticateToken,
   [
     ...validateLibelle,
     body('libelle')
@@ -162,7 +161,7 @@ router.put('/:libelle', authenticateToken, isAdministrateur,
 );
 
 // Route pour supprimer un code promo (administrateur uniquement)
-router.delete('/:libelle', authenticateToken, isAdministrateur, validateLibelle, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete('/:libelle', authenticateToken, validateLibelle, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });

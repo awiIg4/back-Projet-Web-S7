@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import { body, validationResult } from 'express-validator';
 import Utilisateur from '../models/utilisateur';
 import { authenticateToken } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
 import Administrateur from '../models/administrateur';
 
 config(); // Charger les variables d'environnement
@@ -51,7 +50,7 @@ const validateAdminLogin = [
 ];
 
 // Route d'inscription pour les administrateurs avec validation
-router.post('/register',  authenticateToken, isAdministrateur, validateAdminRegister, async (req: Request, res: Response): Promise<void> => {
+router.post('/register',  authenticateToken, validateAdminRegister, async (req: Request, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });

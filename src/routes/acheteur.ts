@@ -4,8 +4,6 @@ import { body, validationResult } from 'express-validator';
 import Utilisateur from '../models/utilisateur';
 import Acheteur from '../models/acheteur';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager } from '../middleware/authorization';
-
 
 config(); // Charger les variables d'environnement
 
@@ -28,7 +26,7 @@ const validateAcheteurRegister = [
 ];
 
 // Route pour créer un acheteur avec un email unique et validation
-router.post('/register', authenticateToken, isAdminOrManager, validateAcheteurRegister, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/register', authenticateToken, validateAcheteurRegister, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -75,7 +73,7 @@ const validateAcheteurGet = [
 ];
 
 // Route pour charger un acheteur grâce à son email avec validation
-router.get('/:email', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:email', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { email } = req.params;
 
     // Optionnel : Valider le paramètre email via express-validator

@@ -4,7 +4,6 @@ import { Op } from 'sequelize';
 import { body, param, validationResult } from 'express-validator';
 import Editeur from '../models/editeur';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdministrateur } from '../middleware/authorization';
 
 config(); // Charger les variables d'environnement
 
@@ -39,7 +38,7 @@ const validateEditeurParams = [
 ];
 
 // Route pour créer un nouvel éditeur
-router.post('/', authenticateToken, isAdministrateur, validateEditeur, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/', authenticateToken, validateEditeur, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -66,7 +65,7 @@ router.post('/', authenticateToken, isAdministrateur, validateEditeur, async (re
 );
 
 // Route pour récupérer tous les éditeurs
-router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const editeurs = await Editeur.findAll();
       res.status(200).json(editeurs);
@@ -78,7 +77,7 @@ router.get('/', authenticateToken, isAdministrateur, async (req: AuthenticatedRe
 );
 
 // Route pour récupérer un éditeur par son ID
-router.get('/:id', authenticateToken, isAdministrateur, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/:id', authenticateToken, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -104,7 +103,7 @@ router.get('/:id', authenticateToken, isAdministrateur, validateEditeurParams, a
 );
 
 // Route pour récupérer un éditeur par son nom
-router.get('/by-name/:nom', authenticateToken, isAdministrateur, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/by-name/:nom', authenticateToken, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -159,7 +158,7 @@ router.get('/search/:query', validateEditeurParams, async (req: Request, res: Re
 );
 
 // Route pour mettre à jour un éditeur
-router.put('/:id', authenticateToken, isAdministrateur,
+router.put('/:id', authenticateToken,
   [
     ...validateEditeurParams,
     body('nom')
@@ -209,7 +208,7 @@ router.put('/:id', authenticateToken, isAdministrateur,
 );
 
 // Route pour supprimer un éditeur
-router.delete('/:id', authenticateToken, isAdministrateur, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete('/:id', authenticateToken, validateEditeurParams, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

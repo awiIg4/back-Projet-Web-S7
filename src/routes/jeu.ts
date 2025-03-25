@@ -12,7 +12,6 @@ import Acheteur from '../models/acheteur';
 import Somme, { SommeCreationAttributes } from '../models/somme';
 import Achat, { AchatCreationAttributes } from '../models/achat';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager } from '../middleware/authorization';
 import { body, query, param, validationResult } from 'express-validator';
 
 config(); // Charger les variables d'environnement
@@ -140,7 +139,7 @@ router.get('/rechercher',
 );
 
 // Route pour les jeux à récupérer par un vendeur pour une session
-router.get('/a_recuperer', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/a_recuperer', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const jeux = await Jeu.findAll({
       where: {
@@ -172,7 +171,7 @@ router.get('/a_recuperer', authenticateToken, isAdminOrManager, async (req: Auth
 });
 
 // Route pour trouver les jeux à mettre en rayon
-router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/pas_en_rayon', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const jeux = await Jeu.findAll({
       where: {
@@ -201,7 +200,7 @@ router.get('/pas_en_rayon', authenticateToken, isAdminOrManager, async (req: Aut
 
 
 // Route pour déposer des jeux pour un vendeur 
-router.post('/deposer', authenticateToken, isAdminOrManager,
+router.post('/deposer', authenticateToken,
   [
     body('licence')
       .exists().withMessage('Le champ licence est requis.')
@@ -326,7 +325,7 @@ router.post('/deposer', authenticateToken, isAdminOrManager,
 );
 
 // Route pour mettre à jour le status d'un ou plusieurs jeux
-router.put('/updateStatus', authenticateToken, isAdminOrManager,
+router.put('/updateStatus', authenticateToken,
   [
     body('jeux_ids')
       .exists().withMessage('Le champ jeux_ids est requis.')
@@ -380,7 +379,7 @@ router.put('/updateStatus', authenticateToken, isAdminOrManager,
 );
 
 // Route pour qu'un vendeur récupère ses jeux
-router.post('/recuperer', authenticateToken, isAdminOrManager,
+router.post('/recuperer', authenticateToken,
   [
     body('jeux_a_recup')
       .exists().withMessage('Le champ jeux_a_recup est requis.')
@@ -430,7 +429,7 @@ router.post('/recuperer', authenticateToken, isAdminOrManager,
 );
 
 // Route pour que quelqu'un achète un jeu
-router.post('/acheter', authenticateToken, isAdminOrManager,
+router.post('/acheter', authenticateToken,
   [
     body('jeux_a_acheter')
       .exists().withMessage('Le champ jeux_a_acheter est requis.')

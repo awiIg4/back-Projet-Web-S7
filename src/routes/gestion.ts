@@ -10,7 +10,6 @@ import Depot from '../models/depot';
 import SessionModel from '../models/session';
 import Somme from '../models/somme';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/authenticateToken';
-import { isAdminOrManager } from '../middleware/authorization';
 import { param, query, validationResult } from 'express-validator';
 
 config(); // Charger les variables d'environnement
@@ -30,8 +29,7 @@ const handleValidationErrors = (req: Request, res: Response, next: Function) => 
 // Route GET /gestion/games/:numpage avec validation et middlewares
 router.get(
   '/games/:numpage',
-  authenticateToken,
-  isAdminOrManager,
+  authenticateToken,,
   [
     param('numpage')
       .exists().withMessage('Le paramètre numpage est requis.')
@@ -117,8 +115,7 @@ router.get(
 // Route GET /gestion/vendeurs/:numpage avec validation et middlewares
 router.get(
   '/vendeurs/:numpage',
-  authenticateToken,
-  isAdminOrManager,
+  authenticateToken,,
   [
     param('numpage')
       .exists().withMessage('Le paramètre numpage est requis.')
@@ -235,7 +232,7 @@ router.get(
 );
 
 // Nouvelle route GET /gestion/bilan avec validation et middlewares
-router.get('/bilan', authenticateToken, isAdminOrManager, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/bilan', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       // Récupérer la session actuelle ou la plus récente
       const today = new Date();
@@ -301,7 +298,7 @@ router.get('/bilan', authenticateToken, isAdminOrManager, async (req: Authentica
 );
 
 // Route GET pour récupérer le bilan d'un vendeur spécifique
-router.get('/bilan/:idvendeur', authenticateToken, isAdminOrManager,
+router.get('/bilan/:idvendeur', authenticateToken,
   [
     param('idvendeur')
       .exists().withMessage('Le paramètre idvendeur est requis.')
