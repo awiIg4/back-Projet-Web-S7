@@ -84,7 +84,7 @@ const validateSessionId = [
 // Route pour créer une nouvelle session
 router.post(
   '/',
-  authenticateToken,,
+  authenticateToken,
   validateCreateSession,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
@@ -123,7 +123,7 @@ router.post(
 // Route pour récupérer toutes les sessions
 router.get(
   '/',
-  authenticateToken,,
+  authenticateToken,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const sessions = await Session.findAll();

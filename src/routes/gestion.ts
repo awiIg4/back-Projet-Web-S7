@@ -29,7 +29,7 @@ const handleValidationErrors = (req: Request, res: Response, next: Function) => 
 // Route GET /gestion/games/:numpage avec validation et middlewares
 router.get(
   '/games/:numpage',
-  authenticateToken,,
+  authenticateToken,
   [
     param('numpage')
       .exists().withMessage('Le paramètre numpage est requis.')
@@ -115,7 +115,7 @@ router.get(
 // Route GET /gestion/vendeurs/:numpage avec validation et middlewares
 router.get(
   '/vendeurs/:numpage',
-  authenticateToken,,
+  authenticateToken,
   [
     param('numpage')
       .exists().withMessage('Le paramètre numpage est requis.')

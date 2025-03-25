@@ -218,7 +218,7 @@ router.get('/stock/:idsession/:idvendeur', authenticateToken, validateIdSessionV
 
 // Route pour récupérer les jeux pour une session, un vendeur et un statut donné
 router.get('/stock/:idsession/:idvendeur/:statut',
-  authenticateToken,,
+  authenticateToken,
   [
     param('idsession').isInt({ gt: 0 }).withMessage('idsession doit être un entier positif'),
     param('idvendeur').isInt({ gt: 0 }).withMessage('idvendeur doit être un entier positif'),
@@ -422,7 +422,7 @@ const validateStatsParams = [
 
 router.get(
   '/stats/:idvendeur',
-  authenticateToken,,
+  authenticateToken,
   validateStatsParams,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const errors = validationResult(req);
