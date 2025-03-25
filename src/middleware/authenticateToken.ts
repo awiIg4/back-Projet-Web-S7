@@ -5,6 +5,20 @@ import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'votre-clé-secrète';
 
+// Interface pour la requête authentifiée
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: number;
+    typeUtilisateur: string;
+  };
+}
+
+// Interface pour le payload du JWT
+interface MyJwtPayload extends JwtPayload {
+  userId: number;
+  typeUtilisateur: string;
+}
+
 export function authenticateToken(
   req: AuthenticatedRequest,
   res: Response,
