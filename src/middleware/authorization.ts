@@ -26,7 +26,11 @@ export function isAdministrateur(
   next: NextFunction
 ): void {
   console.log('Vérification de l\'autorisation: Administrateur', req.user?.typeUtilisateur);
-  if (req.user?.typeUtilisateur === 'administrateur') {
+  if (
+    req.user &&
+    (req.user.typeUtilisateur === 'administrateur' ||
+      req.user.typeUtilisateur === 'gestionnaire')
+  ) {
     return next();
   }
   console.log('Utilisateur non autorisé pour Administrateur');
