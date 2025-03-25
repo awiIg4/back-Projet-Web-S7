@@ -1,7 +1,7 @@
 // src/middleware/authenticateToken.ts
 
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'votre-clé-secrète';
 
@@ -29,23 +29,20 @@ export function authenticateToken(
   console.log('authenticateToken - token:', token); // debug log
 
   if (!token) {
-    // Pas de token → invité
     req.user = { userId: 0, typeUtilisateur: 'invité' };
     console.warn('Pas de token, utilisateur invité.');
     next();
     return;
   }
 
-  jwt.verify(token, accessTokenSecret, (err, decoded) => {
+  jwt.verify(token, accessTokenSecret, (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
     if (err || !decoded || typeof decoded === 'string') {
-      // Token invalide → invité
       req.user = { userId: 0, typeUtilisateur: 'invité' };
       console.warn('Token invalide ou expiré, utilisateur invité.');
       next();
       return;
     }
 
-    // Token valide
     const payload = decoded as MyJwtPayload;
     req.user = {
       userId: payload.userId,
