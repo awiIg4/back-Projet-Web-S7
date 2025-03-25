@@ -5,20 +5,6 @@ import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'votre-clé-secrète';
 
-// Interface pour la requête authentifiée
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: number;
-    typeUtilisateur: string;
-  };
-}
-
-// Interface pour le payload du JWT
-interface MyJwtPayload extends JwtPayload {
-  userId: number;
-  typeUtilisateur: string;
-}
-
 export function authenticateToken(
   req: AuthenticatedRequest,
   res: Response,
@@ -26,27 +12,43 @@ export function authenticateToken(
 ): void {
   const token = req.cookies.accessToken;
 
-  console.log('authenticateToken - token:', token); // Log pour débogage
+  if (token) {
+    jwt.verify(token, accessTokenSecret, (err, decoded) => {
+      if (decoded && typeof decoded !== 'string') {
+        // Token valide
+        req.user = {
+          userId: (decoded as MyJwtPayload).userId,
+          typeUtilisateur: (decoded as MyJwtPayload).typeUtilisateur,
+        };
+      } else {
+        // Token invalide ou expiré => tenter de décoder "manuellement" le payload
+        try {
+          const payloadBase64 = token.split('.')[1];
+          const payloadBuffer = Buffer.from(payloadBase64, 'base64');
+          const payload = JSON.parse(payloadBuffer.toString());
 
-  if (!token) {
-    res.status(401).send('Token manquant. Veuillez vous connecter.');
-    return;
-  }
-
-  jwt.verify(token, accessTokenSecret, (err: VerifyErrors | null, decoded: any) => {
-    if (err || !decoded || typeof decoded === 'string') {
-      console.error('authenticateToken - error:', err); // Log de l'erreur
-      res.status(403).send('Token invalide ou expiré.');
-      return;
-    }
-
+          req.user = {
+            userId: payload.userId || 0,
+            typeUtilisateur: payload.typeUtilisateur || 'invité',
+          };
+          console.warn('authenticateToken - invalid token but decoded payload:', req.user);
+        } catch (decodeError) {
+          // Si vraiment pas décodable, on met une valeur par défaut
+          req.user = {
+            userId: 0,
+            typeUtilisateur: 'invité',
+          };
+          console.warn('authenticateToken - unable to decode token, using default invité user');
+        }
+      }
+      next();
+    });
+  } else {
+    // Pas de token du tout => utilisateur invité
     req.user = {
-      userId: (decoded as MyJwtPayload).userId,
-      typeUtilisateur: (decoded as MyJwtPayload).typeUtilisateur,
+      userId: 0,
+      typeUtilisateur: 'invité',
     };
-
-    console.log('authenticateToken - user:', req.user); // Log de l'utilisateur
-
     next();
-  });
+  }
 }
